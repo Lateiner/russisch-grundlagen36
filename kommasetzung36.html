@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russisch: Kommasetzung (Sofort-Feedback)</title>
+    <style>
+        :root {
+            --primary-color: #00796b; /* Teal */
+            --primary-light: #b2dfdb;
+            --accent-color: #ff5722;
+            --success-color: #4caf50;
+            --error-color: #f44336;
+            --text-color: #333;
+            --bg-color: #f0f4c3;
+            --card-bg: #fff;
+            --btn-bg: #e0e0e0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        h1 { color: var(--primary-color); margin-bottom: 5px; }
+        
+        .instruction {
+            background-color: #fff;
+            border-left: 5px solid var(--accent-color);
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .rule-box {
+            background-color: var(--primary-light);
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        /* Exercise List */
+        .exercise-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sentence-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 2px solid transparent; /* Platz für Feedback-Border */
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .sentence-card.fully-correct {
+            border-color: var(--success-color);
+            background-color: #e8f5e9;
+        }
+
+        .sentence-wrapper {
+            display: flex;
+            flex-wrap: wrap; 
+            align-items: center;
+            gap: 5px;
+            font-size: 1.2em;
+            line-height: 2; 
+        }
+
+        .text-part {
+            padding: 2px 0;
+        }
+
+        /* The Comma Toggle Button */
+        .comma-btn {
+            appearance: none;
+            background-color: var(--btn-bg);
+            border: 2px solid #bdbdbd;
+            border-radius: 6px;
+            min-width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.4em;
+            color: #333;
+            transition: all 0.2s;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            margin: 0 2px;
+        }
+
+        .comma-btn:hover {
+            background-color: #d5d5d5;
+            border-color: #9e9e9e;
+        }
+
+        /* Active State (Comma set by user) */
+        .comma-btn.active {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .comma-btn::before {
+            content: " "; 
+        }
+
+        .comma-btn.active::before {
+            content: ",";
+            position: relative;
+            bottom: 3px;
+        }
+
+        /* Feedback States */
+        /* Correctly set comma */
+        .comma-btn.correct-set {
+            background-color: var(--success-color) !important;
+            border-color: var(--success-color) !important;
+            color: white !important;
+        }
+
+        /* Correctly empty (border feedback) */
+        .comma-btn.correct-empty {
+            border-color: var(--success-color) !important;
+            background-color: #fff !important;
+            opacity: 0.6;
+        }
+
+        /* Missing comma */
+        .comma-btn.wrong-missing {
+            border-color: var(--error-color) !important;
+            background-color: #ffebee !important;
+            position: relative;
+        }
+        .comma-btn.wrong-missing::after {
+            content: ",";
+            color: var(--error-color);
+            font-weight: bold;
+        }
+
+        /* Extra comma (wrongly set) */
+        .comma-btn.wrong-extra {
+            background-color: var(--error-color) !important;
+            border-color: var(--error-color) !important;
+            color: white !important;
+            text-decoration: line-through;
+        }
+
+        /* Partizip Highlighting */
+        .participle-phrase {
+            color: #00695c;
+            border-bottom: 2px dotted #00695c;
+        }
+
+        /* Card Controls (The Check Button) */
+        .card-controls {
+            display: flex;
+            justify-content: flex-end;
+            padding-top: 10px;
+            border-top: 1px dashed #eee;
+        }
+
+        .check-btn-small {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 8px 20px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.2s;
+        }
+
+        .check-btn-small:hover {
+            background-color: #004d40;
+        }
+
+        .check-btn-small:active {
+            transform: scale(0.98);
+        }
+
+        /* Global Controls */
+        .controls {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        button.control-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: transform 0.1s;
+            color: white;
+            min-width: 160px;
+        }
+        button.control-btn:active { transform: scale(0.98); }
+        .btn-reset { background-color: #ff9800; }
+        .btn-solve { background-color: #9e9e9e; }
+
+        @media (max-width: 600px) {
+            .sentence-wrapper { font-size: 1.1em; }
+            .comma-btn { min-width: 40px; height: 40px; }
+            .controls { flex-direction: column; }
+            button.control-btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Russische Grammatik</h1>
+        <p style="color: #666;">Kommasetzung (Partizipialkonstruktion)</p>
+    </header>
+
+    <div class="instruction">
+        <strong>Aufgabe:</strong> Wo müssen Kommas stehen?
+        <br>1. Klicken Sie auf die Kästchen, um ein Komma zu setzen (oder leer zu lassen).
+        <br>2. Klicken Sie rechts auf <strong>„Prüfen“</strong>.
+        <br>3. Korrigieren Sie Fehler (Rot) und prüfen Sie erneut.
+        
+        <div class="rule-box">
+            <strong>Regel:</strong>
+            <br>• Bezugswort + Partizipialkonstruktion → <strong>Kommas</strong>.
+            <br>• Partizipialkonstruktion + Bezugswort → <strong>Keine Kommas</strong>.
+        </div>
+    </div>
+
+    <div class="exercise-list" id="exercise-container">
+        <!-- JS generiert hier die Aufgaben -->
+    </div>
+
+    <div class="controls">
+        <button class="control-btn btn-reset" onclick="initExercise()">Zurücksetzen</button>
+        <button class="control-btn btn-solve" onclick="showAllSolutions()">Lösung anzeigen</button>
+    </div>
+</div>
+
+<script>
+    const sentences = [
+        {
+            parts: ["Студент", "<span class='participle-phrase'>читающий книгу</span>", "мой друг."],
+            commas: [true, true] 
+        },
+        {
+            parts: ["<span class='participle-phrase'>Читающий книгу</span>", "студент", "мой друг."],
+            commas: [false, false]
+        },
+        {
+            parts: ["Я вижу девушку", "<span class='participle-phrase'>танцующую вальс.</span>"],
+            commas: [true]
+        },
+        {
+            parts: ["<span class='participle-phrase'>Танцующая вальс</span>", "девушка", "красива."],
+            commas: [false, false]
+        },
+        {
+            parts: ["Мы", "<span class='participle-phrase'>живущие здесь</span>", "знаем это."],
+            commas: [true, true]
+        },
+        {
+            parts: ["<span class='participle-phrase'>Посещающие музей</span>", "туристы", "довольны."],
+            commas: [false, false]
+        },
+        {
+            parts: ["Туристы", "<span class='participle-phrase'>посещающие музей</span>", "довольны."],
+            commas: [true, true]
+        },
+        {
+            parts: ["Нет человека", "<span class='participle-phrase'>знающего ответ.</span>"],
+            commas: [true]
+        }
+    ];
+
+    function initExercise() {
+        const container = document.getElementById('exercise-container');
+        container.innerHTML = '';
+
+        sentences.forEach((sent, index) => {
+            const card = document.createElement('div');
+            card.className = 'sentence-card';
+            card.id = `card-${index}`;
+
+            // Wrapper für Satz
+            const wrapper = document.createElement('div');
+            wrapper.className = 'sentence-wrapper';
+
+            sent.parts.forEach((part, i) => {
+                const span = document.createElement('span');
+                span.className = 'text-part';
+                span.innerHTML = part;
+                wrapper.appendChild(span);
+
+                if (i < sent.parts.length - 1) {
+                    const btn = document.createElement('div');
+                    btn.className = 'comma-btn';
+                    btn.dataset.btnIndex = i;
+                    // Bei Klick: Feedback entfernen, damit User korrigieren kann
+                    btn.onclick = function() { toggleComma(this); };
+                    wrapper.appendChild(btn);
+                }
+            });
+
+            card.appendChild(wrapper);
+
+            // Controls pro Karte
+            const ctrlDiv = document.createElement('div');
+            ctrlDiv.className = 'card-controls';
+            
+            const checkBtn = document.createElement('button');
+            checkBtn.className = 'check-btn-small';
+            checkBtn.innerHTML = "✓ Prüfen";
+            checkBtn.onclick = function() { checkSentence(index); };
+            
+            ctrlDiv.appendChild(checkBtn);
+            card.appendChild(ctrlDiv);
+            
+            container.appendChild(card);
+        });
+    }
+
+    function toggleComma(btn) {
+        // Entferne Feedback-Klassen bei Interaktion, damit Status "neutral" wird
+        btn.classList.remove('correct-set', 'correct-empty', 'wrong-extra', 'wrong-missing');
+        
+        // Toggle Active
+        btn.classList.toggle('active');
+        
+        // Entferne auch den Status der Karte
+        const card = btn.closest('.sentence-card');
+        card.classList.remove('fully-correct');
+    }
+
+    function checkSentence(index) {
+        const sent = sentences[index];
+        const card = document.getElementById(`card-${index}`);
+        const buttons = card.querySelectorAll('.comma-btn');
+        let allCorrect = true;
+
+        buttons.forEach((btn, btnIndex) => {
+            const isSet = btn.classList.contains('active');
+            const shouldBeSet = sent.commas[btnIndex];
+
+            // Reset classes
+            btn.classList.remove('correct-set', 'correct-empty', 'wrong-extra', 'wrong-missing');
+
+            if (isSet && shouldBeSet) {
+                // Richtiges Komma
+                btn.classList.add('correct-set');
+            } else if (!isSet && !shouldBeSet) {
+                // Richtig leer gelassen
+                btn.classList.add('correct-empty');
+            } else if (isSet && !shouldBeSet) {
+                // Falsches Komma gesetzt
+                btn.classList.add('wrong-extra');
+                allCorrect = false;
+            } else if (!isSet && shouldBeSet) {
+                // Komma fehlt
+                btn.classList.add('wrong-missing');
+                allCorrect = false;
+            }
+        });
+
+        if (allCorrect) {
+            card.classList.add('fully-correct');
+        } else {
+            card.classList.remove('fully-correct');
+        }
+    }
+
+    function showAllSolutions() {
+        sentences.forEach((sent, index) => {
+            const card = document.getElementById(`card-${index}`);
+            // Alles resetten
+            card.classList.remove('fully-correct');
+            const buttons = card.querySelectorAll('.comma-btn');
+
+            buttons.forEach((btn, btnIndex) => {
+                btn.classList.remove('correct-set', 'correct-empty', 'wrong-extra', 'wrong-missing', 'active');
+                
+                const shouldBeSet = sent.commas[btnIndex];
+                if (shouldBeSet) {
+                    btn.classList.add('active');
+                    btn.classList.add('correct-set');
+                } else {
+                    btn.style.opacity = '0.3'; // Inaktive ausblenden
+                }
+            });
+            card.classList.add('fully-correct');
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', initExercise);
+
+</script>
+
+</body>
+</html>
