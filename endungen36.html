@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russisch: Deklination der Partizipien</title>
+    <style>
+        :root {
+            --primary-color: #009688; /* Teal für Grammatik */
+            --primary-light: #e0f2f1;
+            --success-color: #4caf50;
+            --error-color: #f44336;
+            --text-color: #333;
+            --bg-color: #fafafa;
+            --card-bg: #fff;
+            --highlight: #e0f7fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8; /* Höherer Zeilenabstand für Lesbarkeit */
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 { color: var(--primary-color); margin-bottom: 5px; }
+        
+        .instruction {
+            background-color: #fff;
+            border-left: 5px solid var(--primary-color);
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* Sentence List */
+        .sentence-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .sentence-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-left: 5px solid transparent;
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+        }
+
+        .sentence-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .sentence-card.completed {
+            border-left-color: var(--success-color);
+            background-color: #f1f8e9;
+        }
+
+        /* Text Elements */
+        .noun-ref {
+            font-weight: bold;
+            color: #00796b;
+            background-color: var(--highlight);
+            padding: 0 4px;
+            border-radius: 4px;
+        }
+
+        .participle-stem {
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        /* Dropdown Styling */
+        select {
+            font-family: inherit;
+            font-size: 0.95em;
+            padding: 5px 10px;
+            margin: 0 5px;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            background-color: white;
+            cursor: pointer;
+            color: #333;
+            outline: none;
+            min-width: 70px;
+            transition: border-color 0.2s;
+        }
+
+        select:focus {
+            border-color: var(--primary-color);
+        }
+
+        /* Feedback States */
+        select.correct {
+            border-color: var(--success-color);
+            background-color: var(--success-color);
+            color: white;
+            font-weight: bold;
+            pointer-events: none; /* Lock */
+            -webkit-appearance: none; /* Remove arrow for clean look */
+            appearance: none;
+            text-align: center;
+        }
+
+        select.wrong {
+            border-color: var(--error-color);
+            background-color: #ffebee;
+            color: var(--error-color);
+            animation: shake 0.4s;
+        }
+
+        /* Hint (Case Info) */
+        .case-hint {
+            display: block;
+            font-size: 0.8em;
+            color: #888;
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        /* Controls */
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        button.control-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: transform 0.1s;
+            color: white;
+            min-width: 160px;
+        }
+        button.control-btn:active { transform: scale(0.98); }
+        .btn-reset { background-color: #ff9800; }
+        .btn-solve { background-color: #9e9e9e; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @media (max-width: 600px) {
+            .sentence-card {
+                padding: 15px;
+                font-size: 1em;
+            }
+            .controls { flex-direction: column; }
+            button.control-btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Russische Grammatik</h1>
+        <p style="color: #666;">Deklination (KNG-Kongruenz)</p>
+    </header>
+
+    <div class="instruction">
+        <strong>Aufgabe:</strong> Ergänzen Sie die Endung des Partizips.
+        <br>Achten Sie auf das <strong>fett gedruckte Bezugswort</strong> und dessen Fall (Kasus), Geschlecht (Genus) und Zahl (Numerus).
+        <br><em>Wählen Sie die richtige Endung aus der Liste.</em>
+    </div>
+
+    <div class="sentence-list" id="exercise-container">
+        <!-- Sentences generated via JS -->
+    </div>
+
+    <div class="controls">
+        <button class="control-btn btn-reset" onclick="resetExercise()">Zurücksetzen</button>
+        <button class="control-btn btn-solve" onclick="showAllSolutions()">Lösung anzeigen</button>
+    </div>
+</div>
+
+<script>
+    const exercises = [
+        {
+            pre: "Я вижу ",
+            noun: "девушку",
+            postNoun: ", ",
+            stem: "читающ",
+            correct: "ую",
+            postStem: " книгу.",
+            hint: "Akkusativ, Feminin (wie красивую)",
+            options: ["ая", "ую", "ей", "ие"]
+        },
+        {
+            pre: "Вот ",
+            noun: "студент",
+            postNoun: ", ",
+            stem: "изучающ",
+            correct: "ий",
+            postStem: " физику.",
+            hint: "Nominativ, Maskulin (wie хороший)",
+            options: ["ий", "его", "ая", "ие"]
+        },
+        {
+            pre: "Мы подошли к ",
+            noun: "туристам",
+            postNoun: ", ",
+            stem: "фотографирующ",
+            correct: "им",
+            postStem: " памятник.",
+            hint: "Dativ, Plural (wie хорошим)",
+            options: ["их", "им", "ими", "ие"]
+        },
+        {
+            pre: "В этом доме нет ",
+            noun: "людей",
+            postNoun: ", ",
+            stem: "знающ",
+            correct: "их",
+            postStem: " правду.",
+            hint: "Genitiv, Plural (wie хороших)",
+            options: ["их", "им", "ие", "ими"]
+        },
+        {
+            pre: "Я говорю о ",
+            noun: "женщине",
+            postNoun: ", ",
+            stem: "поющ",
+            correct: "ей",
+            postStem: " песню.",
+            hint: "Präpositiv, Feminin (wie хорошей)",
+            options: ["ей", "ую", "ая", "ую"]
+        },
+        {
+            pre: "Он помогает ",
+            noun: "другу",
+            postNoun: ", ",
+            stem: "живущ",
+            correct: "ему",
+            postStem: " в Москве.",
+            hint: "Dativ, Maskulin (wie хорошему)",
+            options: ["ему", "его", "им", "ем"]
+        },
+        {
+            pre: "Мы наблюдаем за ",
+            noun: "солнцем",
+            postNoun: ", ",
+            stem: "заходящ",
+            correct: "им",
+            postStem: " за горизонт.",
+            hint: "Instrumental, Neutrum (wie хорошим)",
+            options: ["им", "ем", "его", "ему"]
+        },
+        {
+            pre: "",
+            noun: "Автобус",
+            postNoun: ", ",
+            stem: "идущ",
+            correct: "ий",
+            postStem: " в центр, уже уехал.",
+            hint: "Nominativ, Maskulin (wie хороший)",
+            options: ["ий", "его", "ая", "ую"]
+        },
+        {
+            pre: "Я знаю этого ",
+            noun: "мальчика",
+            postNoun: ", ",
+            stem: "играющ",
+            correct: "его",
+            postStem: " на гитаре.",
+            hint: "Akkusativ, Maskulin (Belebt! = Genitiv)",
+            options: ["ий", "его", "ему", "им"]
+        },
+        {
+            pre: "",
+            noun: "Девочка",
+            postNoun: ", ",
+            stem: "сидящ",
+            correct: "ая",
+            postStem: " у окна, спит.",
+            hint: "Nominativ, Feminin (wie хорошая)",
+            options: ["ая", "ую", "ей", "ие"]
+        },
+        {
+            pre: "Мы разговариваем с ",
+            noun: "коллегами",
+            postNoun: ", ",
+            stem: "работающ",
+            correct: "ими",
+            postStem: " здесь.",
+            hint: "Instrumental, Plural (wie хорошими)",
+            options: ["ими", "им", "их", "ие"]
+        },
+        {
+            pre: "Это письмо от ",
+            noun: "брата",
+            postNoun: ", ",
+            stem: "живущ",
+            correct: "его",
+            postStem: " в Берлине.",
+            hint: "Genitiv, Maskulin (wie хорошего)",
+            options: ["его", "ему", "им", "ий"]
+        }
+    ];
+
+    function initExercise() {
+        const container = document.getElementById('exercise-container');
+        container.innerHTML = '';
+
+        exercises.forEach((ex, index) => {
+            const card = document.createElement('div');
+            card.className = 'sentence-card';
+            card.id = `card-${index}`;
+
+            // Sentence Builder
+            const sentenceDiv = document.createElement('div');
+            
+            // Text before noun
+            sentenceDiv.appendChild(document.createTextNode(ex.pre));
+            
+            // Noun
+            const nounSpan = document.createElement('span');
+            nounSpan.className = 'noun-ref';
+            nounSpan.textContent = ex.noun;
+            sentenceDiv.appendChild(nounSpan);
+
+            // Text after noun
+            sentenceDiv.appendChild(document.createTextNode(ex.postNoun));
+
+            // Stem
+            const stemSpan = document.createElement('span');
+            stemSpan.className = 'participle-stem';
+            stemSpan.textContent = ex.stem;
+            sentenceDiv.appendChild(stemSpan);
+
+            // Select
+            const select = document.createElement('select');
+            select.dataset.index = index;
+            
+            // Add default option
+            const defaultOpt = document.createElement('option');
+            defaultOpt.text = "...";
+            defaultOpt.value = "";
+            defaultOpt.disabled = true;
+            defaultOpt.selected = true;
+            select.appendChild(defaultOpt);
+
+            // Shuffle options slightly (or keep logical? Random is better for testing)
+            // But usually grammatical options are sorted. Let's shuffle to prevent pattern guessing.
+            const shuffledOptions = [...ex.options].sort(() => Math.random() - 0.5);
+
+            shuffledOptions.forEach(opt => {
+                const el = document.createElement('option');
+                el.value = opt;
+                el.text = "-" + opt;
+                select.appendChild(el);
+            });
+
+            // Logic
+            select.onchange = function() { checkAnswer(this, ex.correct); };
+
+            sentenceDiv.appendChild(select);
+            sentenceDiv.appendChild(document.createTextNode(ex.postStem));
+            
+            card.appendChild(sentenceDiv);
+
+            // Hint
+            const hintDiv = document.createElement('span');
+            hintDiv.className = 'case-hint';
+            hintDiv.textContent = `Tipp: ${ex.hint}`;
+            card.appendChild(hintDiv);
+
+            container.appendChild(card);
+        });
+    }
+
+    function checkAnswer(select, correct) {
+        const card = select.closest('.sentence-card');
+        
+        if (select.value === correct) {
+            select.className = 'correct';
+            card.classList.add('completed');
+        } else {
+            select.className = 'wrong';
+            // Allow retry, keep red until changed
+        }
+    }
+
+    function resetExercise() {
+        const selects = document.querySelectorAll('select');
+        selects.forEach(s => {
+            s.value = "";
+            s.className = "";
+            s.disabled = false;
+        });
+        const cards = document.querySelectorAll('.sentence-card');
+        cards.forEach(c => c.classList.remove('completed'));
+    }
+
+    function showAllSolutions() {
+        exercises.forEach((ex, index) => {
+            const card = document.getElementById(`card-${index}`);
+            const select = card.querySelector('select');
+            
+            select.value = ex.correct;
+            select.className = 'correct';
+            card.classList.add('completed');
+        });
+    }
+
+    // Load
+    document.addEventListener('DOMContentLoaded', initExercise);
+
+</script>
+
+</body>
+</html>
