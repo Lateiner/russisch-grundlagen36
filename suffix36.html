@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russisch: Suffix-Lotto (12 Aufgaben)</title>
+    <style>
+        :root {
+            --primary-color: #673ab7; /* Lila für Lotto-Look */
+            --primary-light: #d1c4e9;
+            --success-color: #4caf50;
+            --error-color: #f44336;
+            --text-color: #333;
+            --bg-color: #f3e5f5;
+            --card-bg: #fff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 { color: var(--primary-color); margin-bottom: 5px; }
+        
+        .instruction {
+            background-color: #fff;
+            border-left: 5px solid var(--primary-color);
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+        }
+
+        /* Lotto Grid */
+        .lotto-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        /* Card Style */
+        .lotto-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: 2px solid transparent;
+            transition: transform 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .lotto-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        }
+
+        .lotto-card.solved {
+            border-color: var(--success-color);
+            background-color: #f1f8e9;
+        }
+
+        /* Word Display */
+        .word-display {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #444;
+            margin: 10px 0;
+            min-height: 1.5em;
+        }
+
+        .missing-part {
+            color: var(--primary-color);
+            border-bottom: 2px dashed var(--primary-color);
+            padding: 0 5px;
+            display: inline-block;
+            min-width: 40px;
+        }
+
+        .word-display.completed .missing-part {
+            color: var(--success-color);
+            border-bottom: none;
+            text-decoration: underline;
+        }
+
+        .hint-text {
+            color: #777;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        .grammar-hint {
+            font-size: 0.85em;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            height: 1.2em; /* Platzhalterhöhe */
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .lotto-card.solved .grammar-hint {
+            opacity: 1;
+        }
+
+        /* Buttons Grid within Card */
+        .options-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .suffix-btn {
+            background: var(--primary-light);
+            color: var(--primary-color);
+            border: none;
+            padding: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .suffix-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Feedback States */
+        .suffix-btn.correct {
+            background: var(--success-color) !important;
+            color: white !important;
+            animation: pop 0.3s;
+        }
+
+        .suffix-btn.wrong {
+            background: var(--error-color) !important;
+            color: white !important;
+            opacity: 0.6;
+            animation: shake 0.4s;
+        }
+
+        .lotto-card.solved .suffix-btn:not(.correct) {
+            opacity: 0.3;
+            pointer-events: none;
+            transform: scale(0.9);
+        }
+
+        /* Controls */
+        .controls {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        button.control-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: transform 0.1s;
+            color: white;
+            min-width: 160px;
+        }
+        button.control-btn:active { transform: scale(0.95); }
+        .btn-reset { background-color: #ff9800; }
+        .btn-solve { background-color: #9e9e9e; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        @keyframes pop {
+            50% { transform: scale(1.1); }
+        }
+
+        @media (max-width: 600px) {
+            .word-display { font-size: 1.5em; }
+            .controls { flex-direction: column; }
+            button.control-btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Russische Grammatik</h1>
+        <p style="color: #555;">Bildung (Morphologie)</p>
+    </header>
+
+    <div class="instruction">
+        <strong>Suffix-Lotto:</strong> Welches Suffix fehlt? <br>
+        Denken Sie an die Konjugation: <br>
+        <strong>I. Konjugation:</strong> -ущ- / -ющ- <br>
+        <strong>II. Konjugation:</strong> -ащ- / -ящ- <br>
+        <em>Wählen Sie den richtigen Baustein!</em>
+    </div>
+
+    <div class="lotto-grid" id="game-board">
+        <!-- Cards generated via JS -->
+    </div>
+
+    <div class="controls">
+        <button class="control-btn btn-reset" onclick="initGame()">Zurücksetzen</button>
+        <button class="control-btn btn-solve" onclick="showAllSolutions()">Lösung anzeigen</button>
+    </div>
+</div>
+
+<script>
+    const exercises = [
+        {
+            wordPrefix: "люб",
+            wordSuffix: "ий",
+            correct: "ящ",
+            hint: "любить (lieben)",
+            grammar: "II. Konj. -> они любят"
+        },
+        {
+            wordPrefix: "чита",
+            wordSuffix: "ий",
+            correct: "ющ",
+            hint: "читать (lesen)",
+            grammar: "I. Konj. -> они читают"
+        },
+        {
+            wordPrefix: "пиш",
+            wordSuffix: "ий",
+            correct: "ущ",
+            hint: "писать (schreiben)",
+            grammar: "I. Konj. -> они пишут"
+        },
+        {
+            wordPrefix: "крич",
+            wordSuffix: "ий",
+            correct: "ащ",
+            hint: "кричать (schreien)",
+            grammar: "II. Konj. -> они кричат (nach Zischlaut)"
+        },
+        {
+            wordPrefix: "смотр",
+            wordSuffix: "ий",
+            correct: "ящ",
+            hint: "смотреть (schauen)",
+            grammar: "II. Konj. (Ausnahme) -> они смотрят"
+        },
+        {
+            wordPrefix: "жд",
+            wordSuffix: "ий",
+            correct: "ущ",
+            hint: "ждать (warten)",
+            grammar: "I. Konj. -> они ждут"
+        },
+        {
+            wordPrefix: "кле",
+            wordSuffix: "ий",
+            correct: "ящ",
+            hint: "клеить (kleben)",
+            grammar: "II. Konj. -> они клеят"
+        },
+        {
+            wordPrefix: "бор",
+            wordSuffix: "ийся", // Reflexiv
+            correct: "ющ",
+            hint: "бороться (kämpfen)",
+            grammar: "I. Konj. -> они борются"
+        },
+        {
+            wordPrefix: "держ",
+            wordSuffix: "ий",
+            correct: "ащ",
+            hint: "держать (halten)",
+            grammar: "II. Konj. (Ausnahme) -> они держат"
+        },
+        {
+            wordPrefix: "реж",
+            wordSuffix: "ий",
+            correct: "ущ",
+            hint: "резать (schneiden)",
+            grammar: "I. Konj. -> они режут"
+        },
+        {
+            wordPrefix: "завис",
+            wordSuffix: "ий",
+            correct: "ящ",
+            hint: "зависеть (abhängen)",
+            grammar: "II. Konj. (Ausnahme) -> они зависят"
+        },
+        {
+            wordPrefix: "рису",
+            wordSuffix: "ий",
+            correct: "ющ",
+            hint: "рисовать (zeichnen)",
+            grammar: "I. Konj. (-ова- -> -у-) -> они рисуют"
+        }
+    ];
+
+    const suffixes = ["ущ", "ющ", "ащ", "ящ"];
+
+    function initGame() {
+        const board = document.getElementById('game-board');
+        board.innerHTML = '';
+
+        exercises.forEach((ex, index) => {
+            const card = document.createElement('div');
+            card.className = 'lotto-card';
+            card.dataset.correct = ex.correct;
+
+            // Word Construction
+            const wordDisplay = document.createElement('div');
+            wordDisplay.className = 'word-display';
+            wordDisplay.innerHTML = `${ex.wordPrefix}<span class="missing-part" id="gap-${index}">...</span>${ex.wordSuffix}`;
+            
+            // Hints
+            const hint = document.createElement('div');
+            hint.className = 'hint-text';
+            hint.textContent = ex.hint;
+
+            const grammar = document.createElement('div');
+            grammar.className = 'grammar-hint';
+            grammar.textContent = ex.grammar;
+
+            // Buttons Container
+            const btnContainer = document.createElement('div');
+            btnContainer.className = 'options-container';
+
+            // Create 4 standard buttons
+            suffixes.forEach(suffix => {
+                const btn = document.createElement('button');
+                btn.className = 'suffix-btn';
+                btn.textContent = "-" + suffix + "-";
+                
+                btn.onclick = function() {
+                    checkAnswer(this, suffix, ex.correct, index, card);
+                };
+
+                btnContainer.appendChild(btn);
+            });
+
+            // Append everything
+            card.appendChild(wordDisplay);
+            card.appendChild(hint);
+            card.appendChild(grammar);
+            card.appendChild(btnContainer);
+            
+            board.appendChild(card);
+        });
+    }
+
+    function checkAnswer(btn, selected, correct, index, card) {
+        if (card.classList.contains('solved')) return;
+
+        if (selected === correct) {
+            // Correct
+            btn.classList.add('correct');
+            card.classList.add('solved');
+            
+            // Fill gap
+            const gap = document.getElementById(`gap-${index}`);
+            gap.textContent = correct;
+            gap.parentElement.classList.add('completed');
+        } else {
+            // Wrong
+            btn.classList.add('wrong');
+            // Remove wrong class after animation to allow retry? 
+            // Better keep it marked red so user knows not to click again.
+        }
+    }
+
+    function showAllSolutions() {
+        const cards = document.querySelectorAll('.lotto-card');
+        
+        cards.forEach((card, index) => {
+            if (!card.classList.contains('solved')) {
+                const correctSuffix = card.dataset.correct;
+                
+                // Find the correct button
+                const buttons = card.querySelectorAll('.suffix-btn');
+                buttons.forEach(btn => {
+                    if (btn.textContent.includes(correctSuffix)) {
+                        btn.classList.add('correct');
+                    } else {
+                        btn.classList.remove('wrong'); // Clean up errors
+                    }
+                });
+
+                // Update visual state
+                card.classList.add('solved');
+                const gap = document.getElementById(`gap-${index}`);
+                gap.textContent = correctSuffix;
+                gap.parentElement.classList.add('completed');
+            }
+        });
+    }
+
+    // Init on load
+    document.addEventListener('DOMContentLoaded', initGame);
+
+</script>
+
+</body>
+</html>
