@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russisch: Rückumwandlung (Partizip zu Который)</title>
+    <style>
+        :root {
+            --primary-color: #607d8b; /* Blue Grey - Sachlich/Strukturiert */
+            --primary-light: #cfd8dc;
+            --secondary-color: #009688;
+            --success-color: #4caf50;
+            --error-color: #f44336;
+            --text-color: #333;
+            --bg-color: #eceff1;
+            --card-bg: #fff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        h1 { color: var(--primary-color); margin-bottom: 5px; }
+        
+        .instruction {
+            background-color: #fff;
+            border-left: 5px solid var(--primary-color);
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* Exercise List */
+        .exercise-list {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .task-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid #e0e0e0;
+        }
+
+        /* Sentence Styling */
+        .source-sentence {
+            background-color: #f5f5f5;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            color: #555;
+            border-left: 4px solid var(--primary-light);
+        }
+
+        .highlight-participle {
+            color: var(--secondary-color);
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+        .target-sentence {
+            font-size: 1.15em;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 5px;
+            background-color: #e0f2f1; /* Light Teal bg for target */
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        /* Dropdowns */
+        select {
+            padding: 8px 12px;
+            font-size: 0.95em;
+            border: 2px solid #b0bec5;
+            border-radius: 6px;
+            background-color: white;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        select:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 5px rgba(0,150,136,0.3);
+        }
+
+        /* Feedback States */
+        select.correct {
+            border-color: var(--success-color);
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            font-weight: bold;
+            pointer-events: none; /* Lock input */
+        }
+
+        select.wrong {
+            border-color: var(--error-color);
+            background-color: #ffebee;
+            color: #c62828;
+            animation: shake 0.4s;
+        }
+
+        .arrow-icon {
+            display: block;
+            text-align: center;
+            font-size: 1.5em;
+            color: #90a4ae;
+            margin: -10px 0 5px 0;
+            line-height: 1;
+        }
+
+        /* Controls */
+        .controls {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        button.control-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: transform 0.1s;
+            color: white;
+            min-width: 160px;
+        }
+        button.control-btn:active { transform: scale(0.98); }
+        .btn-reset { background-color: #ff9800; }
+        .btn-solve { background-color: #9e9e9e; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @media (max-width: 600px) {
+            .target-sentence {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            select { margin: 5px 0; }
+            .controls { flex-direction: column; }
+            button.control-btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Russische Grammatik</h1>
+        <p style="color: #666;">Syntax: Rückumwandlung</p>
+    </header>
+
+    <div class="instruction">
+        <strong>Aufgabe:</strong> Wandeln Sie die Partizipialkonstruktion zurück in einen Relativsatz mit „который“.
+        <br>1. Wählen Sie die richtige Form von <strong>который</strong> (Kongruenz mit dem Bezugswort).
+        <br>2. Wählen Sie die richtige Form des <strong>Verbs</strong>.
+    </div>
+
+    <div class="exercise-list" id="exercise-container">
+        <!-- JS generiert hier die Aufgaben -->
+    </div>
+
+    <div class="controls">
+        <button class="control-btn btn-reset" onclick="initExercise()">Zurücksetzen</button>
+        <button class="control-btn btn-solve" onclick="showAllSolutions()">Lösung anzeigen</button>
+    </div>
+</div>
+
+<script>
+    const data = [
+        {
+            // Beispiel 1: Maskulin
+            preSource: "Я вижу ",
+            noun: "студента",
+            participle: "читающего",
+            postSource: " книгу.",
+            
+            preTarget: "Я вижу студента, ",
+            correctKot: "который",
+            correctVerb: "читает",
+            postTarget: " книгу.",
+            
+            optsKot: ["который", "которого", "которая"],
+            optsVerb: ["читает", "читают", "читал"]
+        },
+        {
+            // Beispiel 2: Feminin
+            preSource: "Вот ",
+            noun: "девушка",
+            participle: "танцующая",
+            postSource: " вальс.",
+            
+            preTarget: "Вот девушка, ",
+            correctKot: "которая",
+            correctVerb: "танцует",
+            postTarget: " вальс.",
+            
+            optsKot: ["который", "которую", "которая"],
+            optsVerb: ["танцует", "танцуют", "танцевала"]
+        },
+        {
+            // Beispiel 3: Plural
+            preSource: "Мы знаем ",
+            noun: "людей",
+            participle: "живущих",
+            postSource: " здесь.",
+            
+            preTarget: "Мы знаем людей, ",
+            correctKot: "которые",
+            correctVerb: "живут",
+            postTarget: " здесь.",
+            
+            optsKot: ["которые", "которых", "которыми"],
+            optsVerb: ["живёт", "живут", "жили"]
+        },
+        {
+            // Beispiel 4: Neutrum
+            preSource: "Смотри на ",
+            noun: "солнце",
+            participle: "заходящее",
+            postSource: " за тучи.",
+            
+            preTarget: "Смотри на солнце, ",
+            correctKot: "которое",
+            correctVerb: "заходит",
+            postTarget: " за тучи.",
+            
+            optsKot: ["которое", "который", "которая"],
+            optsVerb: ["заходит", "заходят", "заходило"]
+        },
+        {
+            // Beispiel 5: Maskulin (Genitiv im Hauptsatz, Nom im Relativsatz)
+            preSource: "Нет ",
+            noun: "человека",
+            participle: "знающего",
+            postSource: " ответ.",
+            
+            preTarget: "Нет человека, ",
+            correctKot: "который",
+            correctVerb: "знает",
+            postTarget: " ответ.",
+            
+            optsKot: ["который", "которого", "которому"],
+            optsVerb: ["знает", "знают", "знал"]
+        },
+        {
+            // Beispiel 6: Feminin (Akkusativ im Hauptsatz)
+            preSource: "Он любит ",
+            noun: "женщину",
+            participle: "поющую",
+            postSource: " джаз.",
+            
+            preTarget: "Он любит женщину, ",
+            correctKot: "которая",
+            correctVerb: "поёт",
+            postTarget: " джаз.",
+            
+            optsKot: ["которая", "которую", "которой"],
+            optsVerb: ["поёт", "поют", "пела"]
+        },
+        {
+            // Beispiel 7: Plural (Dativ im Hauptsatz)
+            preSource: "Я звоню ",
+            noun: "родителям",
+            participle: "волнующимся",
+            postSource: " за меня.",
+            
+            preTarget: "Я звоню родителям, ",
+            correctKot: "которые",
+            correctVerb: "волнуются",
+            postTarget: " за меня.",
+            
+            optsKot: ["которые", "которым", "которых"],
+            optsVerb: ["волнуются", "волнуется", "волновались"]
+        },
+        {
+            // Beispiel 8: Reflexivverb
+            preSource: "Ребёнок, ",
+            noun: "",
+            participle: "смеющийся",
+            postSource: " громко, играет.",
+            
+            preTarget: "Ребёнок, ",
+            correctKot: "который",
+            correctVerb: "смеётся",
+            postTarget: " громко, играет.",
+            
+            optsKot: ["который", "которая", "которое"],
+            optsVerb: ["смеётся", "смеются", "смеялся"]
+        }
+    ];
+
+    function initExercise() {
+        const container = document.getElementById('exercise-container');
+        container.innerHTML = '';
+
+        data.forEach((item, index) => {
+            const card = document.createElement('div');
+            card.className = 'task-card';
+
+            // 1. Source Sentence
+            const sourceDiv = document.createElement('div');
+            sourceDiv.className = 'source-sentence';
+            sourceDiv.innerHTML = `${item.preSource}<strong>${item.noun}</strong> <span class="highlight-participle">${item.participle}</span>${item.postSource}`;
+            card.appendChild(sourceDiv);
+
+            // Arrow
+            const arrow = document.createElement('div');
+            arrow.className = 'arrow-icon';
+            arrow.innerHTML = '↓';
+            card.appendChild(arrow);
+
+            // 2. Target Sentence with Dropdowns
+            const targetDiv = document.createElement('div');
+            targetDiv.className = 'target-sentence';
+
+            // Part 1: Text before
+            const preSpan = document.createElement('span');
+            preSpan.textContent = item.preTarget;
+            targetDiv.appendChild(preSpan);
+
+            // Select 1: Kotoriy
+            const selKot = createSelect(item.optsKot, item.correctKot);
+            targetDiv.appendChild(selKot);
+
+            // Select 2: Verb
+            const selVerb = createSelect(item.optsVerb, item.correctVerb);
+            targetDiv.appendChild(selVerb);
+
+            // Part 2: Text after
+            const postSpan = document.createElement('span');
+            postSpan.textContent = item.postTarget;
+            targetDiv.appendChild(postSpan);
+
+            card.appendChild(targetDiv);
+            container.appendChild(card);
+        });
+    }
+
+    function createSelect(options, correctValue) {
+        const select = document.createElement('select');
+        
+        // Default option
+        const def = document.createElement('option');
+        def.text = "???";
+        def.value = "";
+        def.disabled = true;
+        def.selected = true;
+        select.appendChild(def);
+
+        // Shuffle options to avoid pattern guessing
+        const shuffled = [...options].sort(() => Math.random() - 0.5);
+
+        shuffled.forEach(opt => {
+            const el = document.createElement('option');
+            el.text = opt;
+            el.value = opt;
+            select.appendChild(el);
+        });
+
+        // Validation on change
+        select.addEventListener('change', function() {
+            if (this.value === correctValue) {
+                this.className = 'correct';
+            } else {
+                this.className = 'wrong';
+            }
+        });
+
+        // Store correct answer for "Solve" button
+        select.dataset.correct = correctValue;
+
+        return select;
+    }
+
+    function initExerciseLogic() {
+        // Wrapper for reset button (just re-runs init)
+        initExercise();
+    }
+
+    function showAllSolutions() {
+        const selects = document.querySelectorAll('select');
+        selects.forEach(sel => {
+            sel.value = sel.dataset.correct;
+            sel.className = 'correct';
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', initExercise);
+
+</script>
+
+</body>
+</html>
