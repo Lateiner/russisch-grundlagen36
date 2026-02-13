@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russische Grammatik: Aktive Partizipien der Gegenwart</title>
+    <!-- Polyfill für Drag & Drop auf Touch-Geräten -->
+    <script src="https://cdn.jsdelivr.net/npm/drag-drop-touch@1.3.1/DragDropTouch.js"></script>
+    <style>
+        :root {
+            --primary-color: #3f51b5;
+            --primary-light: #e8eaf6;
+            --success-color: #4caf50;
+            --error-color: #f44336;
+            --text-color: #333;
+            --bg-color: #f9f9f9;
+            --card-bg: #fff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header, section {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        h1 { color: var(--primary-color); text-align: center; }
+        h2 { color: var(--primary-color); border-bottom: 2px solid var(--primary-light); padding-bottom: 10px; margin-top: 0; }
+        h3 { color: #555; font-size: 1.1em; margin-bottom: 15px; }
+
+        .explanation-box {
+            background-color: var(--primary-light);
+            padding: 15px;
+            border-left: 5px solid var(--primary-color);
+            border-radius: 4px;
+        }
+
+        .ru { font-weight: bold; color: #2c3e50; }
+        
+        /* Interactive Elements */
+        .btn-group {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .btn-check { background-color: var(--primary-color); color: white; }
+        .btn-check:hover { background-color: #303f9f; }
+        .btn-reset { background-color: #ff9800; color: white; }
+        .btn-reset:hover { background-color: #f57c00; }
+        .btn-solve { background-color: #9e9e9e; color: white; }
+        .btn-solve:hover { background-color: #757575; }
+
+        /* Specific Exercise Styles */
+        
+        /* Dropdowns & Inputs */
+        select {
+            padding: 5px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: white;
+        }
+
+        /* Drag and Drop Generic */
+        .draggable-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #eee;
+            border-radius: 4px;
+            min-height: 50px;
+        }
+
+        .draggable {
+            background: white;
+            border: 1px solid #ccc;
+            padding: 5px 10px;
+            cursor: grab;
+            border-radius: 4px;
+            user-select: none;
+            display: inline-block;
+        }
+        
+        .draggable.dragging { opacity: 0.5; }
+
+        .dropzone {
+            display: inline-block;
+            min-width: 100px;
+            min-height: 30px;
+            border: 2px dashed #bbb;
+            background: #fafafa;
+            vertical-align: middle;
+            margin: 0 5px;
+            padding: 2px;
+            border-radius: 4px;
+        }
+
+        /* Exercise 1 & 9: Click Selection */
+        .selectable-word {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .selectable-word.selected {
+            background-color: var(--primary-light);
+            border-color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        /* Exercise 5: Columns */
+        .columns-2 {
+            display: flex;
+            gap: 20px;
+        }
+        .column {
+            flex: 1;
+            background: var(--primary-light);
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .column .dropzone-list {
+            min-height: 100px;
+            background: rgba(255,255,255,0.5);
+            border: 2px dashed #999;
+            padding: 10px;
+        }
+
+        /* Exercise 10: Sentence Builder */
+        .sentence-builder-zone {
+            min-height: 50px;
+            border-bottom: 2px solid var(--primary-color);
+            padding: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* Feedback States */
+        .correct { border-color: var(--success-color) !important; background-color: #e8f5e9 !important; color: var(--success-color); }
+        .wrong { border-color: var(--error-color) !important; background-color: #ffebee !important; color: var(--error-color); }
+        
+        span.feedback-icon { margin-left: 5px; font-weight: bold; }
+
+        @media (max-width: 600px) {
+            .columns-2 { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Russische Grammatik</h1>
+        <h2>Das aktive Partizip der Gegenwart</h2>
+        <div class="explanation-box">
+            <p><strong>Was ist das?</strong> Ein Verbaladjektiv, das eine Handlung beschreibt, die das Subjekt gerade selbst ausführt (z.B. „der lesende Mann“).</p>
+            <p><strong>Bildung (nur von unvollendeten Verben):</strong></p>
+            <ol>
+                <li>Man nimmt die <strong>3. Person Plural</strong> im Präsens (sie ...).</li>
+                <li>Man streicht die Endung <strong>-т</strong> (oder die letzten zwei Buchstaben).</li>
+                <li>Man fügt das passende Suffix hinzu:
+                    <ul>
+                        <li><strong>-ущ- / -ющ-</strong> bei Verben der I. Konjugation (e-Konjugation).<br>
+                            <em>Beispiel:</em> читать → они чита<strong>ют</strong> → чита<strong>ющ</strong>ий</li>
+                        <li><strong>-ащ- / -ящ-</strong> bei Verben der II. Konjugation (i-Konjugation).<br>
+                            <em>Beispiel:</em> говорить → они говор<strong>ят</strong> → говор<strong>ящ</strong>ий</li>
+                    </ul>
+                </li>
+                <li>Endung wie ein Adjektiv (z.B. -ий, -ая, -ее, -ие).</li>
+            </ol>
+        </div>
+    </header>
+
+    <!-- Aufgabe 1 -->
+    <section id="ex1">
+        <h2>1. Identifikation</h2>
+        <h3>Klicken Sie auf alle Wörter in der Liste, die aktive Partizipien der Gegenwart sind.</h3>
+        <div class="selection-area" id="ex1-area">
+            <span class="selectable-word" data-correct="false">читал</span>
+            <span class="selectable-word" data-correct="true">читающий</span>
+            <span class="selectable-word" data-correct="false">красивый</span>
+            <span class="selectable-word" data-correct="true">говорящая</span>
+            <span class="selectable-word" data-correct="false">делают</span>
+            <span class="selectable-word" data-correct="true">видящий</span>
+            <span class="selectable-word" data-correct="false">большой</span>
+            <span class="selectable-word" data-correct="true">любящие</span>
+        </div>
+        <div class="btn-group">
+            <button class="btn-check" onclick="checkEx1()">Überprüfen</button>
+            <button class="btn-reset" onclick="resetEx1()">Zurücksetzen</button>
+            <button class="btn-solve" onclick="solveEx1()">Lösung anzeigen</button>
+        </div>
+    </section>
+
+    <!-- Aufgabe 2 -->
+    <section id="ex2">
+        <h2>2. Das richtige Suffix wählen</h2>
+        <h3>Wählen Sie das korrekte Suffix basierend auf der Konjugation.</h3>
+        <div>
+            1. Работать (I. Konj.) → они работают → работ<select data-ans="ющ"><option value="">-</option><option value="ущ">ущ</option><option value="ющ">ющ</option><option value="ащ">ащ</option><option value="ящ">ящ</option></select>ий<br><br>
+            2. Любить (II. Konj.) → они любят → люб<select data-ans="ящ"><option value="">-</option><option value="ущ">ущ</option><option value="ющ">ющ</option><option value="ащ">ащ</option><option value="ящ">ящ</option></select>ий<br><br>
+            3. Ждать (I. Konj.) → они ждут → жд<select data-ans="ущ"><option value="">-</option><option value="ущ">ущ</option><option value="ющ">ющ</option><option value="ащ">ащ</option><option value="ящ">ящ</option></select>ий<br><br>
+            4. Кричать (II. Konj.) → они кричат → крич<select data-ans="ащ"><option value="">-</option><option value="ущ">ущ</option><option value="ющ">ющ</option><option value="ащ">ащ</option><option value="ящ">ящ</option></select>ий
+        </div>
+        <div class="btn-group">
+            <button class="btn-check" onclick="checkSelects('ex2')">Überprüfen</button>
+            <button class="btn-reset" onclick="resetSelects('ex2')">Zurücksetzen</button>
+            <button class="btn-solve" onclick="solveSelects('ex2')">Lösung anzeigen</button>
+        </div>
+    </section>
+
+    <!-- Aufgabe 3 -->
+    <section id="ex3">
+        <h2>3. Zuordnung: Infinitiv und Partizip</h2>
+        <h3>Ziehen Sie den Infinitiv auf das passende Partizip.</h3>
+        <div class="draggable-container" id="ex3-source">
+            <div class="draggable" draggable="true" data-id="3">нести</div>
+            <div class="draggable" draggable="true" data-id="1">знать</div>
+            <div class="draggable" draggable="true" data-id="4">дышать</div>
+            <div class="draggable" draggable="true" data-id="2">строить</div>
+        </div>
+        <div class="matches">
+            <p>знающий: <span class="dropzone" data-target="1"></span></p>
+            <p>строящий: <span class="dropzone" data-target="2"></span></p>
+            <p>несущий: <span class="dropzone" data-target="3"></span></p>
+            <p>дышащий: <span class="dropzone" data-target="4"></span></p>
+        </div>
+        <div class="btn-group">
+            <button class="btn-check" onclick="checkDnD('ex3')">Überprüfen</button>
+            <button class="btn-reset" onclick="resetDnD('ex3', 'ex3-source')">Zurücksetzen</button>
+            <button class="btn-solve" onclick="solveDnD('ex3', 'ex3-source')">Lösung anzeigen</button>
+        </div>
+    </section>
+
+    <!-- Aufgabe 4 -->
+    <section id="ex4">
+        <h2>4. Richtig oder Falsch?</h2>
+        <h3>Ist das Partizip korrekt gebildet?</h3>
+        <div>
+            <p>1. писать (они пишут) → писающий <br>
+                <label><input type="radio" name="ex4_1" value="falsch" data-correct="false"> Richtig</label> 
+                <label><input type="radio" name="ex4_1" value="richtig" data-correct="true"> Falsch (korrekt: пишущий)</label>
+            </p>
+            <p>2. хотеть (они хотят) → хотящий <br>
+                <label><input type="radio" name="ex4_2" value="richtig" data-correct="true"> Richtig</label> 
+                <label><input type="radio" name="ex4_2" value="falsch" data-correct="false"> Falsch</label>
+            </p>
+            <p>3. жить (они живут) → живящий <br>
+                <label><input type="radio" name="ex4_3" value="falsch" data-correct="false"> Richtig</label> 
+                <label><input type="radio" name="ex4_3" value="richtig" data-correct="true"> Falsch (korrekt: живущий)</label>
+            </p>
+        </div>
+        <div class="btn-group">
+            <button class="btn-check" onclick="checkRadios('ex4')">Überprüfen</button>
+            <button class="btn-reset" onclick="resetRadios('ex4')">Zurücksetzen</button>
+            <button class="btn-solve" onclick="solveRadios('ex4')">Lösung anzeigen</button>
+        </div>
+    </section>
+
+    <!-- Aufgabe 5 -->
+    <section id="ex5">
+        <h2>5. Sortieren nach Konjugation</h2>
+        <h3>Ziehen Sie die Verben in die Gruppe, die das entsprechende Suffix (-ущ/-ющ oder -ащ/-ящ) benötigt.</h3>
+        <div class="draggable-container" id="ex5-source">
+            <div class="draggable" draggable="true" data-group="2">лежать</div>
+            <div class="draggable" draggable="true" data-group="1">ехать</div>
+            <div class="draggable" draggable="true" data-group="2">учить</div>
+            <div class="draggable" draggable="true" data-group="1">понимать</div>
+        </div>
+        <div class="columns-2">
+            <div class="column">
+                <h4>Gruppe 1: -ущ- / -ющ-</h4>
+                <div class="dropzone-list dropzone-full" data-target-group="1"></div>
+            </div>
+            <div class="column">
+                <h4>Gruppe 2: -ащ- / -ящ-</h4>
+                <div class="dropzone-list dropzone-full" data-target-group="2"></div>
+            </div>
+        </div>
+        <div class="btn-group">
+            <button class="btn-check" onclick="checkSort('ex5')">Überprüfen</button>
+            <button class="btn-reset" onclick="resetSort('ex5', 'ex5-source')">Zurücksetzen</button>
+            <button class="btn-solve" onclick="solveSort('ex5')">Lösung anzeigen</button>
+        </div>
+    </section>
+
+    <!-- Aufgabe 6 -->
+    <section id="ex6">
+        <h2>6. Kasus-Anpassung</h2>
+        <h3>Ergänzen Sie den Satz mit der richtigen Endung des Partizips.</h3>
+        <div>
+            <p>Я вижу девушку, ... (читающий) книгу.</p>
+            <select data-ans="читающую">
+                <option value="">-</option>
+                <option value="читающая">читающая (Nom.)</option>
+                <option value="читающую">читающую (Akk.)</option>
+                <option value="читающей">читающей (Gen./Dat.)</option>
+            </select>
+            <p>Мы говорим о студенте, ... (изучающий) русский язык.</p>
+            <select data-ans="изучающем">
+                <option value="">-</option>
+                <option value="изучающий">изучающий (Nom.)</option>
+                <option value="изучающего">изучающего (Gen./Akk.)</option>
+                <option value="изучающем">изучающем (Präp.)</option>
+            </select>
+        </div>
+        <div class="btn-group">
+            <button class="btn-check" onclick="checkSelects('ex6')">Überprüfen</button>
+            <button class="btn-reset" onclick="resetSelects('ex6')">Zurücksetzen</button>
+            <button class="btn-solve" onclick="solveSelects('ex6')">Lösung anzeigen</button>
+        </div>
+    </section>
+
+    <!-- Aufgabe 7 -->
+    <section id="ex7">
+        <h2>7. Satz-Transformation</h2>
+        <h3>Welcher Satz ersetzt die Konstruktion mit „который“ korrekt?</h3>
+        <p>Original: <em>Мальчик, который играет в футбол, мой брат.</em></p>
+        <div id="ex7-options">
+            <div style="margin-bottom: 10px;">
+                <input type="radio" name="ex7_opt" id="ex7_a" value="wrong">
+                <label for="ex7_a">Мальчик, игравший в футбол, мой брат.</label>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <input type="radio" name="ex7_opt" id="ex7_b" value="correct">
+                <label for="ex7_b">Мальчик, играющий в футбол, мой брат.</label>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <input type="radio" name="ex7_opt" id="ex7_c" value="wrong">
+                <label for="ex7_c">Мальчик, играемый в футбол, мой брат.</label>
+            </div>
+        </div>
+        <div class="btn-group">
+            <button class="btn-check" onclick="checkSingleRadio('ex7_opt')">Überprüfen</button>
+            <button class="btn-reset" onclick="resetSingleRadio('ex7_opt')">Zurücksetzen</button>
+            <button class="btn-solve" onclick="solveSingleRadio('ex7_opt', 'ex7_b')">Lösung anzeigen</button>
+        </div>
+    </section>
+
+    <!-- Aufgabe 8 -->
+    <section id="ex8">
+        <h2>8. Vokalwahl</h2>
+        <h3>Welcher Vokal fehlt im Partizip?</h3>
+        <p>Смотр...щий (von смотреть - II. Konj., Ausnahme: они смотрят)</p>
+        <div>
+            <label><input type="radio" name="ex8_1" value="wrong"> ю</label>
+            <label><input type="radio" name="ex8_1" value="correct"> я</label>
+            <label><input type="radio" name="ex8_1" value="wrong"> у</label>
+        </div>
+        <p>Ид...щий (von идти - I. Konj.: они идут)</p>
+        <div>
+            <label><input type="radio" name="ex8_2" value="wrong"> ю</label>
+            <label><input type="radio" name="ex8_2" value="correct"> у</label>
+            <label><input type="radio" name="ex8_2" value="wrong"> я</label>
+        </div>
+        <div class="btn-group">
+            <button class="btn-check" onclick="checkMultiRadio('ex8')">Überprüfen</button>
+            <button class="btn-reset" onclick="resetMultiRadio('ex8')">Zurücksetzen</button>
+            <button class="btn-solve" onclick="solveMultiRadio('ex8')">Lösung anzeigen</button>
+        </div>
+    </section>
+
+    <!-- Aufgabe 9 -->
+    <section id="ex9">
+        <h2>9. Ausnahmen finden</h2>
+        <h3>Markieren Sie die beiden Verben, die zur II. Konjugation (Ausnahmen) gehören und das Suffix -ащ/-ящ bilden, obwohl sie auf -еть enden.</h3>
+        <div class="selection-area" id="ex9-area">
+            <span class="selectable-word" data-correct="false">иметь</span>
+            <span class="selectable-word" data-correct="true">видеть</span>
+            <span class="selectable-word" data-correct="false">уметь</span>
+            <span class="selectable-word" data-correct="true">зависеть</span>
+            <span class="selectable-word" data-correct="false">жалеть</span>
+        </div>
+        <div class="btn-group">
+            <button class="btn-check" onclick="checkEx1('ex9-area')">Überprüfen</button>
+            <button class="btn-reset" onclick="resetEx1('ex9-area')">Zurücksetzen</button>
+            <button class="btn-solve" onclick="solveEx1('ex9-area')">Lösung anzeigen</button>
+        </div>
+    </section>
+
+    <!-- Aufgabe 10 -->
+    <section id="ex10">
+        <h2>10. Satzbau</h2>
+        <h3>Bringen Sie die Wörter in die richtige Reihenfolge (Subjekt - Partizipialkonstruktion - Prädikat).</h3>
+        <div class="draggable-container" id="ex10-source">
+            <div class="draggable" draggable="true" data-index="1">Туристы,</div>
+            <div class="draggable" draggable="true" data-index="3">Москву,</div>
+            <div class="draggable" draggable="true" data-index="2">посещающие</div>
+            <div class="draggable" draggable="true" data-index="4">довольны.</div>
+        </div>
+        <div class="sentence-builder-zone" id="ex10-zone">
+            <!-- Drop area -->
+        </div>
+        <div class="btn-group">
+            <button class="btn-check" onclick="checkOrder('ex10-zone')">Überprüfen</button>
+            <button class="btn-reset" onclick="resetOrder('ex10-source', 'ex10-zone')">Zurücksetzen</button>
+            <button class="btn-solve" onclick="solveOrder('ex10-source', 'ex10-zone')">Lösung anzeigen</button>
+        </div>
+    </section>
+
+    <!-- Aufgabe 11 -->
+    <section id="ex11">
+        <h2>11. Genus-Anpassung</h2>
+        <h3>Wählen Sie die richtige Endung passend zum Substantiv.</h3>
+        <div>
+            1. Солнце (Neutrum), вста<select data-ans="ющее"><option value="">-</option><option value="ющий">ющий</option><option value="ющая">ющая</option><option value="ющее">ющее</option></select> (вставать)<br><br>
+            2. Мама (Femininum), готов<select data-ans="ящая"><option value="">-</option><option value="ящий">ящий</option><option value="ящая">ящая</option><option value="ящее">ящее</option></select> (готовить)<br><br>
+            3. Папа (Maskulinum), гуля<select data-ans="ющий"><option value="">-</option><option value="ющий">ющий</option><option value="ющая">ющая</option><option value="ющее">ющее</option></select> (гулять)
+        </div>
+        <div class="btn-group">
+            <button class="btn-check" onclick="checkSelects('ex11')">Überprüfen</button>
+            <button class="btn-reset" onclick="resetSelects('ex11')">Zurücksetzen</button>
+            <button class="btn-solve" onclick="solveSelects('ex11')">Lösung anzeigen</button>
+        </div>
+    </section>
+
+    <!-- Aufgabe 12 -->
+    <section id="ex12">
+        <h2>12. Bedeutung und Übersetzung</h2>
+        <h3>Ordnen Sie die deutsche Übersetzung dem russischen Partizip zu.</h3>
+        <div class="draggable-container" id="ex12-source">
+            <div class="draggable" draggable="true" data-id="4">der tanzende</div>
+            <div class="draggable" draggable="true" data-id="1">der schlafende</div>
+            <div class="draggable" draggable="true" data-id="3">der singende</div>
+            <div class="draggable" draggable="true" data-id="2">der gebende</div>
+        </div>
+        <div class="matches">
+            <p>дающий: <span class="dropzone" data-target="2"></span></p>
+            <p>танцующий: <span class="dropzone" data-target="4"></span></p>
+            <p>спящий: <span class="dropzone" data-target="1"></span></p>
+            <p>поющий: <span class="dropzone" data-target="3"></span></p>
+        </div>
+        <div class="btn-group">
+            <button class="btn-check" onclick="checkDnD('ex12')">Überprüfen</button>
+            <button class="btn-reset" onclick="resetDnD('ex12', 'ex12-source')">Zurücksetzen</button>
+            <button class="btn-solve" onclick="solveDnD('ex12', 'ex12-source')">Lösung anzeigen</button>
+        </div>
+    </section>
+
+</div>
+
+<script>
+    /* --- Allgemeine Hilfsfunktionen --- */
+    function setFeedback(element, isCorrect) {
+        element.classList.remove('correct', 'wrong');
+        element.classList.add(isCorrect ? 'correct' : 'wrong');
+    }
+    
+    // Fisher-Yates Shuffle zum Mischen von Arrays
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+    
+    // Initiales Mischen beim Laden der Seite
+    document.addEventListener('DOMContentLoaded', () => {
+        // Liste der IDs, die gemischt werden sollen
+        const shuffleIds = [
+            {container: 'ex3-source', selector: '.draggable'},
+            {container: 'ex5-source', selector: '.draggable'},
+            {container: 'ex10-source', selector: '.draggable'},
+            {container: 'ex12-source', selector: '.draggable'}
+        ];
+
+        shuffleIds.forEach(item => {
+            const container = document.getElementById(item.container);
+            if(container) {
+                const elements = Array.from(container.querySelectorAll(item.selector));
+                shuffleArray(elements);
+                elements.forEach(el => container.appendChild(el));
+            }
+        });
+    });
+
+    /* --- Übung 1 & 9: Klick-Auswahl --- */
+    document.querySelectorAll('.selectable-word').forEach(word => {
+        word.addEventListener('click', function() {
+            this.classList.toggle('selected');
+        });
+    });
+
+    function checkEx1(areaId = 'ex1-area') {
+        const words = document.querySelectorAll(`#${areaId} .selectable-word`);
+        words.forEach(word => {
+            const isSelected = word.classList.contains('selected');
+            const isCorrect = word.getAttribute('data-correct') === 'true';
+            
+            if (isSelected) {
+                setFeedback(word, isCorrect);
+            } else if (isCorrect) {
+                word.classList.add('wrong');
+            }
+        });
+    }
+
+    function resetEx1(areaId = 'ex1-area') {
+        const words = document.querySelectorAll(`#${areaId} .selectable-word`);
+        words.forEach(word => {
+            word.classList.remove('selected', 'correct', 'wrong');
+        });
+    }
+
+    function solveEx1(areaId = 'ex1-area') {
+        resetEx1(areaId);
+        const words = document.querySelectorAll(`#${areaId} .selectable-word`);
+        words.forEach(word => {
+            if (word.getAttribute('data-correct') === 'true') {
+                word.classList.add('selected');
+                word.classList.add('correct');
+            }
+        });
+    }
+
+    /* --- Übung 2, 6, 11: Dropdowns --- */
+    function checkSelects(sectionId) {
+        const selects = document.querySelectorAll(`#${sectionId} select`);
+        selects.forEach(sel => {
+            const correct = sel.getAttribute('data-ans');
+            setFeedback(sel, sel.value === correct);
+        });
+    }
+
+    function resetSelects(sectionId) {
+        const selects = document.querySelectorAll(`#${sectionId} select`);
+        selects.forEach(sel => {
+            sel.value = "";
+            sel.classList.remove('correct', 'wrong');
+        });
+    }
+
+    function solveSelects(sectionId) {
+        const selects = document.querySelectorAll(`#${sectionId} select`);
+        selects.forEach(sel => {
+            sel.value = sel.getAttribute('data-ans');
+            sel.classList.remove('wrong');
+            sel.classList.add('correct');
+        });
+    }
+
+    /* --- Drag & Drop Logic (Übung 3, 12) --- */
+    let draggedItem = null;
+
+    document.addEventListener('dragstart', function(e) {
+        if (e.target.classList.contains('draggable')) {
+            draggedItem = e.target;
+            e.dataTransfer.setData('text/plain', e.target.getAttribute('data-id') || e.target.getAttribute('data-group') || e.target.getAttribute('data-index'));
+            e.target.classList.add('dragging');
+        }
+    });
+
+    document.addEventListener('dragend', function(e) {
+        if (e.target.classList.contains('draggable')) {
+            e.target.classList.remove('dragging');
+        }
+    });
+
+    document.addEventListener('dragover', function(e) {
+        e.preventDefault();
+    });
+
+    document.addEventListener('drop', function(e) {
+        e.preventDefault();
+        // Generische Drop-Zone Logik
+        if (e.target.classList.contains('dropzone') && !e.target.hasChildNodes()) {
+            if (draggedItem) {
+                e.target.appendChild(draggedItem);
+                draggedItem = null;
+            }
+        }
+        // Logik für Listen (Übung 5) und Sentence Builder (Übung 10)
+        else if (e.target.classList.contains('dropzone-list') || e.target.classList.contains('sentence-builder-zone')) {
+            if (draggedItem) {
+                e.target.appendChild(draggedItem);
+                draggedItem = null;
+            }
+        }
+    });
+
+    // Validierung Ex 3 & 12
+    function checkDnD(sectionId) {
+        const zones = document.querySelectorAll(`#${sectionId} .dropzone`);
+        zones.forEach(zone => {
+            if (zone.children.length > 0) {
+                const child = zone.children[0];
+                const match = child.getAttribute('data-id') === zone.getAttribute('data-target');
+                setFeedback(child, match);
+            }
+        });
+    }
+
+    function resetDnD(sectionId, sourceId) {
+        const source = document.getElementById(sourceId);
+        // Alle Draggables sammeln (auch die bereits abgelegten)
+        const draggables = Array.from(document.querySelectorAll(`#${sectionId} .draggable`));
+        
+        // Mischen
+        shuffleArray(draggables);
+
+        draggables.forEach(d => {
+            d.classList.remove('correct', 'wrong');
+            source.appendChild(d); // Zurück in den Source-Container schieben
+        });
+
+        // Feedback in Dropzones entfernen
+        const zones = document.querySelectorAll(`#${sectionId} .dropzone`);
+        zones.forEach(z => z.classList.remove('correct', 'wrong'));
+    }
+
+    function solveDnD(sectionId, sourceId) {
+        // Erst resetten, aber ohne Mischen hier, da wir zuordnen wollen
+        // Wir nutzen resetDnD um alles in Source zu holen, dann sortieren wir neu.
+        const source = document.getElementById(sourceId);
+        const draggables = Array.from(document.querySelectorAll(`#${sectionId} .draggable`));
+        draggables.forEach(d => {
+             d.classList.remove('correct', 'wrong');
+             source.appendChild(d);
+        });
+        
+        const zones = document.querySelectorAll(`#${sectionId} .dropzone`);
+        zones.forEach(zone => zone.classList.remove('correct', 'wrong'));
+
+        zones.forEach(zone => {
+            const targetId = zone.getAttribute('data-target');
+            const match = draggables.find(d => d.getAttribute('data-id') === targetId);
+            if (match) {
+                zone.appendChild(match);
+                match.classList.add('correct');
+            }
+        });
+    }
+
+    /* --- Übung 4: Radio Buttons (Gruppen) --- */
+    function checkRadios(sectionId) {
+        ['ex4_1', 'ex4_2', 'ex4_3'].forEach(name => {
+            const radios = document.getElementsByName(name);
+            radios.forEach(r => {
+                if (r.checked) {
+                    const isCorrect = r.getAttribute('data-correct') === 'true';
+                    r.parentElement.style.color = isCorrect ? 'var(--success-color)' : 'var(--error-color)';
+                    r.parentElement.style.fontWeight = 'bold';
+                }
+            });
+        });
+    }
+
+    function resetRadios(sectionId) {
+        const radios = document.querySelectorAll(`#${sectionId} input[type="radio"]`);
+        radios.forEach(r => {
+            r.checked = false;
+            r.parentElement.style.color = 'inherit';
+            r.parentElement.style.fontWeight = 'normal';
+        });
+    }
+
+    function solveRadios(sectionId) {
+        resetRadios(sectionId);
+        const radios = document.querySelectorAll(`#${sectionId} input[type="radio"]`);
+        radios.forEach(r => {
+            if(r.getAttribute('data-correct') === 'true') {
+                r.checked = true;
+                r.parentElement.style.color = 'var(--success-color)';
+            }
+        });
+    }
+
+    /* --- Übung 5: Sortieren (Spalten) --- */
+    function checkSort(sectionId) {
+        const lists = document.querySelectorAll(`#${sectionId} .dropzone-list`);
+        lists.forEach(list => {
+            const targetGroup = list.getAttribute('data-target-group');
+            Array.from(list.children).forEach(child => {
+                const isCorrect = child.getAttribute('data-group') === targetGroup;
+                setFeedback(child, isCorrect);
+            });
+        });
+    }
+
+    function resetSort(sectionId, sourceId) {
+        const source = document.getElementById(sourceId);
+        const draggables = Array.from(document.querySelectorAll(`#${sectionId} .draggable`));
+        
+        // Mischen beim Reset
+        shuffleArray(draggables);
+
+        draggables.forEach(d => {
+            d.classList.remove('correct', 'wrong');
+            source.appendChild(d);
+        });
+    }
+
+    function solveSort(sectionId) {
+        const lists = document.querySelectorAll(`#${sectionId} .dropzone-list`);
+        // Alle zurückholen
+        const source = document.getElementById('ex5-source');
+        const draggables = Array.from(document.querySelectorAll(`#${sectionId} .draggable`));
+        draggables.forEach(d => { d.classList.remove('correct', 'wrong'); source.appendChild(d); });
+
+        // Verteilen
+        draggables.forEach(d => {
+            const group = d.getAttribute('data-group');
+            const targetList = Array.from(lists).find(l => l.getAttribute('data-target-group') === group);
+            if(targetList) {
+                targetList.appendChild(d);
+                d.classList.add('correct');
+            }
+        });
+    }
+
+    /* --- Übung 7: Single Radio Choice --- */
+    function checkSingleRadio(name) {
+        const radios = document.getElementsByName(name);
+        radios.forEach(r => {
+            if(r.checked) {
+                const isCorrect = r.value === 'correct';
+                r.parentElement.style.color = isCorrect ? 'var(--success-color)' : 'var(--error-color)';
+                r.parentElement.style.fontWeight = 'bold';
+            }
+        });
+    }
+    
+    function resetSingleRadio(name) {
+         const radios = document.getElementsByName(name);
+         radios.forEach(r => {
+             r.checked = false;
+             r.parentElement.style.color = 'inherit';
+             r.parentElement.style.fontWeight = 'normal';
+         });
+    }
+    
+    function solveSingleRadio(name, correctId) {
+        resetSingleRadio(name);
+        const el = document.getElementById(correctId);
+        if(el) {
+            el.checked = true;
+            el.parentElement.style.color = 'var(--success-color)';
+            el.parentElement.style.fontWeight = 'bold';
+        }
+    }
+
+    /* --- Übung 8: Multiple Groups Radio --- */
+    function checkMultiRadio(sectionId) {
+        const inputs = document.querySelectorAll(`#${sectionId} input[type=radio]`);
+        inputs.forEach(input => {
+            if(input.checked) {
+                const isCorrect = input.value === 'correct';
+                input.parentElement.style.color = isCorrect ? 'var(--success-color)' : 'var(--error-color)';
+            }
+        });
+    }
+
+    function resetMultiRadio(sectionId) {
+        const inputs = document.querySelectorAll(`#${sectionId} input[type=radio]`);
+        inputs.forEach(input => {
+            input.checked = false;
+            input.parentElement.style.color = 'inherit';
+        });
+    }
+
+    function solveMultiRadio(sectionId) {
+        const inputs = document.querySelectorAll(`#${sectionId} input[type=radio]`);
+        inputs.forEach(input => {
+            input.parentElement.style.color = 'inherit';
+            if(input.value === 'correct') {
+                input.checked = true;
+                input.parentElement.style.color = 'var(--success-color)';
+            }
+        });
+    }
+
+    /* --- Übung 10: Sentence Ordering --- */
+    function checkOrder(zoneId) {
+        const zone = document.getElementById(zoneId);
+        const children = Array.from(zone.children);
+        children.forEach((child, index) => {
+            const correctIndex = parseInt(child.getAttribute('data-index'));
+            if (correctIndex === index + 1) {
+                setFeedback(child, true);
+            } else {
+                setFeedback(child, false);
+            }
+        });
+    }
+
+    function resetOrder(sourceId, zoneId) {
+        const source = document.getElementById(sourceId);
+        const zone = document.getElementById(zoneId);
+        const children = Array.from(zone.children);
+        
+        // Auch alle im Source holen, falls noch welche da sind
+        const sourceChildren = Array.from(source.children);
+        const allItems = [...children, ...sourceChildren];
+        
+        // Mischen beim Reset
+        shuffleArray(allItems);
+
+        allItems.forEach(c => {
+            c.classList.remove('correct', 'wrong');
+            source.appendChild(c);
+        });
+    }
+
+    function solveOrder(sourceId, zoneId) {
+        const source = document.getElementById(sourceId);
+        const zone = document.getElementById(zoneId);
+        const allItems = [...Array.from(source.children), ...Array.from(zone.children)];
+        
+        allItems.sort((a, b) => parseInt(a.getAttribute('data-index')) - parseInt(b.getAttribute('data-index')));
+
+        allItems.forEach(item => {
+            item.classList.remove('wrong');
+            item.classList.add('correct');
+            zone.appendChild(item);
+        });
+    }
+
+</script>
+
+</body>
+</html>
