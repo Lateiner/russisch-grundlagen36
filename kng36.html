@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russisch: Klammer-Übung (Deklination)</title>
+    <style>
+        :root {
+            --primary-color: #795548; /* Braunton für Text/Buch-Feeling */
+            --primary-light: #d7ccc8;
+            --accent-color: #ff9800;
+            --success-color: #4caf50;
+            --error-color: #f44336;
+            --text-color: #333;
+            --bg-color: #f5f5f5;
+            --card-bg: #fff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        h1 { color: var(--primary-color); margin-bottom: 5px; }
+        
+        .instruction {
+            background-color: #fff;
+            border-left: 5px solid var(--primary-color);
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* --- Übungskarten --- */
+        .exercise-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .task-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .task-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .task-card.solved {
+            border-color: var(--success-color);
+            background-color: #f1f8e9;
+        }
+
+        .sentence {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+
+        /* Der Teil in der Klammer (Aufgabe) */
+        .bracket-part {
+            color: var(--primary-color);
+            font-weight: bold;
+            font-style: italic;
+            background: var(--primary-light);
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        /* Wenn gelöst: Zeige das richtige Wort grün an */
+        .solved-text {
+            color: var(--success-color);
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+        /* Options Buttons Container */
+        .options-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #eee;
+        }
+
+        .option-btn {
+            background: #fff;
+            border: 2px solid #ccc;
+            border-radius: 20px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.2s;
+            flex: 1; /* Buttons gleich groß */
+            min-width: 120px;
+            text-align: center;
+            color: #555;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background: #fff8e1;
+        }
+
+        /* Feedback States */
+        .option-btn.correct {
+            background-color: var(--success-color) !important;
+            border-color: var(--success-color) !important;
+            color: white !important;
+            pointer-events: none;
+        }
+
+        .option-btn.wrong {
+            background-color: var(--error-color) !important;
+            border-color: var(--error-color) !important;
+            color: white !important;
+            animation: shake 0.4s;
+        }
+
+        /* Controls */
+        .controls {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        button.control-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: transform 0.1s;
+            color: white;
+            min-width: 160px;
+        }
+        button.control-btn:active { transform: scale(0.98); }
+        .btn-reset { background-color: #ff9800; }
+        .btn-solve { background-color: #9e9e9e; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @media (max-width: 600px) {
+            .options-wrapper {
+                flex-direction: column; /* Stapeln auf Handy */
+            }
+            .controls { flex-direction: column; }
+            button.control-btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Russische Grammatik</h1>
+        <p style="color: #666;">Klammer-Übung (KNG-Kongruenz)</p>
+    </header>
+
+    <div class="instruction">
+        <strong>Aufgabe:</strong> Setzen Sie das Partizip in der Klammer in den richtigen Fall.
+        <br>Achten Sie auf das Bezugswort im Satz. Wählen Sie die richtige Form unten aus.
+        <br><em>Grün = Richtig, Rot = Falsch.</em>
+    </div>
+
+    <div class="exercise-list" id="exercise-container">
+        <!-- JS generiert hier die Aufgaben -->
+    </div>
+
+    <div class="controls">
+        <button class="control-btn btn-reset" onclick="initExercise()">Zurücksetzen</button>
+        <button class="control-btn btn-solve" onclick="showAllSolutions()">Lösung anzeigen</button>
+    </div>
+</div>
+
+<script>
+    const tasks = [
+        {
+            pre: "Мы увидели девушку, ",
+            base: "читающий",
+            post: " книгу.",
+            correct: "читающую",
+            options: ["читающая", "читающую", "читающей"] // Distraktoren
+        },
+        {
+            pre: "Я подошёл к студенту, ",
+            base: "стоящий",
+            post: " у окна.",
+            correct: "стоящему",
+            options: ["стоящий", "стоящего", "стоящему"]
+        },
+        {
+            pre: "В комнате нет людей, ",
+            base: "знающий",
+            post: " ответ.",
+            correct: "знающих",
+            options: ["знающие", "знающих", "знающими"]
+        },
+        {
+            pre: "Он разговаривает с мужчиной, ",
+            base: "живущий",
+            post: " в этом доме.",
+            correct: "живущим",
+            options: ["живущим", "живущем", "живущий"]
+        },
+        {
+            pre: "Письмо лежало на столе, ",
+            base: "стоящий",
+            post: " в углу.",
+            correct: "стоящем", // Präpositiv (на столе)
+            options: ["стоящий", "стоящем", "стоящим"]
+        },
+        {
+            pre: "Мы смотрим на птиц, ",
+            base: "летящий",
+            post: " на юг.",
+            correct: "летящих", // Akkusativ Plural (belebt) -> Genitiv-Endung
+            options: ["летящие", "летящих", "летящими"]
+        },
+        {
+            pre: "Это подарок для мамы, ",
+            base: "любящий",
+            post: " цветы.",
+            correct: "любящей",
+            options: ["любящая", "любящей", "любящую"]
+        },
+        {
+            pre: "Туристы, ",
+            base: "посещающий",
+            post: " музей, должны купить билет.",
+            correct: "посещающие",
+            options: ["посещающие", "посещающих", "посещающими"]
+        },
+        {
+            pre: "Я вижу автобус, ",
+            base: "идущий",
+            post: " в центр.",
+            correct: "идущий", // Akkusativ Mask. unbelebt = Nom
+            options: ["идущий", "идущего", "идущем"]
+        },
+        {
+            pre: "Они говорили о проблемах, ",
+            base: "волнующий",
+            post: " всех.",
+            correct: "волнующих", // Präpositiv Plural
+            options: ["волнующие", "волнующими", "волнующих"]
+        }
+    ];
+
+    function initExercise() {
+        const container = document.getElementById('exercise-container');
+        container.innerHTML = '';
+
+        tasks.forEach((task, index) => {
+            const card = document.createElement('div');
+            card.className = 'task-card';
+            card.dataset.id = index;
+
+            // Satz-Anzeige
+            const sentenceDiv = document.createElement('div');
+            sentenceDiv.className = 'sentence';
+            
+            // Aufbau: Text vor Klammer + [Klammer] + Text nach Klammer
+            sentenceDiv.innerHTML = `${task.pre} <span class="bracket-part" id="bracket-${index}">(${task.base})</span> ${task.post}`;
+            
+            card.appendChild(sentenceDiv);
+
+            // Button Container
+            const btnContainer = document.createElement('div');
+            btnContainer.className = 'options-wrapper';
+
+            // Optionen mischen
+            const shuffledOptions = [...task.options].sort(() => Math.random() - 0.5);
+
+            shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = opt;
+                
+                btn.onclick = function() {
+                    checkAnswer(this, opt, task.correct, index);
+                };
+
+                btnContainer.appendChild(btn);
+            });
+
+            card.appendChild(btnContainer);
+            container.appendChild(card);
+        });
+    }
+
+    function checkAnswer(btn, selected, correct, index) {
+        const card = document.querySelector(`.task-card[data-id="${index}"]`);
+        
+        // Wenn schon gelöst, nichts tun (optional, hier erlauben wir Korrektur bis richtig)
+        if (card.classList.contains('solved')) return;
+
+        if (selected === correct) {
+            // Richtig
+            btn.classList.add('correct');
+            card.classList.add('solved');
+            
+            // Text in der Klammer ersetzen
+            const bracketSpan = document.getElementById(`bracket-${index}`);
+            bracketSpan.className = 'solved-text';
+            bracketSpan.textContent = correct; // Klammern weg, richtiges Wort rein
+
+            // Andere Buttons deaktivieren
+            const allBtns = card.querySelectorAll('.option-btn');
+            allBtns.forEach(b => {
+                if (b !== btn) b.style.opacity = '0.5';
+                b.style.pointerEvents = 'none';
+            });
+
+        } else {
+            // Falsch
+            btn.classList.add('wrong');
+            // User kann weiter probieren
+        }
+    }
+
+    function showAllSolutions() {
+        tasks.forEach((task, index) => {
+            const card = document.querySelector(`.task-card[data-id="${index}"]`);
+            if (card.classList.contains('solved')) return; // Schon gelöst
+
+            // Finde den richtigen Button
+            const btns = card.querySelectorAll('.option-btn');
+            let correctBtn;
+            btns.forEach(b => {
+                if (b.textContent === task.correct) correctBtn = b;
+            });
+
+            if (correctBtn) {
+                // Simuliere Klick oder setze Status manuell
+                checkAnswer(correctBtn, task.correct, task.correct, index);
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', initExercise);
+
+</script>
+
+</body>
+</html>
