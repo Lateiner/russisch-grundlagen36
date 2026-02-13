@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russisch: Übersetzung & Stil (10 Sätze)</title>
+    <style>
+        :root {
+            --primary-color: #283593; /* Dunkelblau */
+            --primary-light: #e8eaf6;
+            --accent-color: #ffca28; /* Gelb/Orange für Hinweise */
+            --success-color: #4caf50;
+            --error-color: #f44336;
+            --text-color: #333;
+            --bg-color: #f5f5f5;
+            --card-bg: #fff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        h1 { color: var(--primary-color); margin-bottom: 5px; }
+        
+        .instruction {
+            background-color: #fff;
+            border-left: 5px solid var(--primary-color);
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .tip-box {
+            background-color: #fff8e1;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 0.95em;
+            border: 1px solid #ffe0b2;
+        }
+
+        /* Exercise List */
+        .exercise-list {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .task-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .task-card.solved {
+            border-color: var(--success-color);
+            background-color: #f1f8e9;
+        }
+
+        /* Russian Sentence */
+        .ru-sentence {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .highlight-part {
+            color: var(--primary-color);
+        }
+
+        /* Options */
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: #fff;
+            border: 2px solid #cfd8dc;
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 1.05em;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            color: #455a64;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            position: relative;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary-color);
+            background-color: var(--primary-light);
+        }
+
+        /* Status Styles */
+        .option-btn.correct {
+            background-color: var(--success-color) !important;
+            border-color: var(--success-color) !important;
+            color: white !important;
+            padding-right: 40px;
+        }
+        .option-btn.correct::after {
+            content: "★";
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2em;
+        }
+
+        /* Literal / Clunky Translation (Orange) */
+        .option-btn.literal {
+            background-color: #ff9800 !important;
+            border-color: #ff9800 !important;
+            color: white !important;
+        }
+
+        /* Wrong Grammar (Red) */
+        .option-btn.wrong {
+            background-color: var(--error-color) !important;
+            border-color: var(--error-color) !important;
+            color: white !important;
+            opacity: 0.7;
+            text-decoration: line-through;
+        }
+
+        /* Explanation Text below */
+        .feedback-text {
+            margin-top: 15px;
+            font-size: 0.9em;
+            font-style: italic;
+            display: none;
+        }
+
+        .feedback-text.show { display: block; }
+        .feedback-text.success { color: var(--success-color); }
+        .feedback-text.warning { color: #f57c00; }
+        .feedback-text.error { color: var(--error-color); }
+
+        /* Controls */
+        .controls {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        button.control-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: transform 0.1s;
+            color: white;
+            min-width: 160px;
+        }
+        button.control-btn:active { transform: scale(0.98); }
+        .btn-reset { background-color: #ff9800; }
+        .btn-solve { background-color: #9e9e9e; }
+
+        @media (max-width: 600px) {
+            .controls { flex-direction: column; }
+            button.control-btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Russische Grammatik</h1>
+        <p style="color: #666;">Russisch -> Deutsch: Stil & Semantik</p>
+    </header>
+
+    <div class="instruction">
+        <strong>Aufgabe:</strong> Wählen Sie die <strong>beste</strong> und natürlichste deutsche Übersetzung.
+        <br>Im Russischen nutzen wir Partizipien sehr oft. Im Deutschen bevorzugen wir meist eine andere Struktur.
+        <div class="tip-box">
+            💡 <strong>Tipp:</strong> Suchen Sie im Deutschen nach einem <strong>Relativsatz</strong> (der/die/das...), das klingt meist besser als ein Partizip vor dem Nomen.
+        </div>
+    </div>
+
+    <div class="exercise-list" id="exercise-container">
+        <!-- JS generates tasks here -->
+    </div>
+
+    <div class="controls">
+        <button class="control-btn btn-reset" onclick="initExercise()">Zurücksetzen</button>
+        <button class="control-btn btn-solve" onclick="showAllSolutions()">Lösung anzeigen</button>
+    </div>
+</div>
+
+<script>
+    /*
+      Status types:
+      - 'best': The natural translation (Relative Clause) -> Green
+      - 'literal': Grammatically okayish but clunky (Participle I) -> Orange
+      - 'wrong': Grammatically incorrect -> Red
+    */
+    const tasks = [
+        {
+            russian: "Мальчик, <span class='highlight-part'>читающий</span> книгу",
+            options: [
+                { text: "Der Junge, der ein Buch liest", status: "best", msg: "Perfekt! Der Relativsatz ist natürlich." },
+                { text: "Der ein Buch lesende Junge", status: "literal", msg: "Grammatisch möglich, aber sehr steif (Schriftsprache)." },
+                { text: "Der Junge, lesend ein Buch", status: "wrong", msg: "Falsche Grammatik im Deutschen." }
+            ]
+        },
+        {
+            russian: "Туристы, <span class='highlight-part'>посещающие</span> Берлин",
+            options: [
+                { text: "Die Touristen, die Berlin besuchen", status: "best", msg: "Richtig! Das klingt am besten." },
+                { text: "Die Berlin besuchenden Touristen", status: "literal", msg: "Klingt sehr 'papieren' und formell." },
+                { text: "Die Touristen besuchen Berlin", status: "wrong", msg: "Das ist ein Hauptsatz, kein Attribut." }
+            ]
+        },
+        {
+            russian: "Женщина, <span class='highlight-part'>живущая</span> здесь",
+            options: [
+                { text: "Die Frau, die hier wohnt", status: "best", msg: "Genau. Relativsatz ist hier Standard." },
+                { text: "Die hier wohnende Frau", status: "literal", msg: "Etwas umständlich für den Alltag." },
+                { text: "Die Frau, wo hier wohnt", status: "wrong", msg: "Umgangssprache/Dialekt, aber kein Standarddeutsch." }
+            ]
+        },
+        {
+            russian: "Автобус, <span class='highlight-part'>идущий</span> в центр",
+            options: [
+                { text: "Der Bus, der ins Zentrum fährt", status: "best", msg: "Sehr gut!" },
+                { text: "Der ins Zentrum fahrende Bus", status: "literal", msg: "In Fahrplänen okay, sonst eher steif." },
+                { text: "Der Bus, gehend ins Zentrum", status: "wrong", msg: "Falsche Wortwahl ('gehen' für Bus) und falsche Grammatik." }
+            ]
+        },
+        {
+            russian: "Люди, <span class='highlight-part'>знающие</span> правду",
+            options: [
+                { text: "Die Leute, die die Wahrheit kennen", status: "best", msg: "Richtig übersetzt." },
+                { text: "Die Wahrheit wissenden Leute", status: "literal", msg: "Sehr ungewöhnlich formuliert." },
+                { text: "Leute, wissend die Wahrheit", status: "wrong", msg: "Grammatikalisch falsch." }
+            ]
+        },
+        {
+            russian: "Студент, <span class='highlight-part'>изучающий</span> физику",
+            options: [
+                { text: "Der Student, der Physik studiert", status: "best", msg: "Perfekt." },
+                { text: "Der Physik studierende Student", status: "literal", msg: "Stilistisch unschön (Wortwiederholung Student/studierend)." },
+                { text: "Der Student, studiert Physik", status: "wrong", msg: "Verbposition falsch." }
+            ]
+        },
+        {
+            russian: "Девушка, <span class='highlight-part'>танцующая</span> вальс",
+            options: [
+                { text: "Das Mädchen, das Walzer tanzt", status: "best", msg: "Richtig (oder 'Die junge Frau...')." },
+                { text: "Das Walzer tanzende Mädchen", status: "literal", msg: "Grammatisch korrekt, aber seltener benutzt." },
+                { text: "Das Mädchen, die tanzt", status: "wrong", msg: "Relativpronomen falsch (Mädchen ist Neutrum: das)." }
+            ]
+        },
+        {
+            russian: "Солнце, <span class='highlight-part'>заходящее</span> за гору",
+            options: [
+                { text: "Die Sonne, die hinter dem Berg untergeht", status: "best", msg: "Sehr natürlich." },
+                { text: "Die hinter dem Berg untergehende Sonne", status: "literal", msg: "Ein klassisches 'Partizipialattribut', sehr schriftsprachlich." },
+                { text: "Sonne, die untergeht", status: "wrong", msg: "Artikel fehlt im Deutschen oft nicht." }
+            ]
+        },
+        {
+            russian: "Дети, <span class='highlight-part'>смеющиеся</span> громко",
+            options: [
+                { text: "Die Kinder, die laut lachen", status: "best", msg: "Klingt lebendig und richtig." },
+                { text: "Die laut lachenden Kinder", status: "literal", msg: "Möglich, aber Relativsatz ist oft flüssiger." },
+                { text: "Die Kinder lachend laut", status: "wrong", msg: "Wortstellung falsch." }
+            ]
+        },
+        {
+            russian: "Человек, <span class='highlight-part'>говорящий</span> по-русски",
+            options: [
+                { text: "Der Mann, der Russisch spricht", status: "best", msg: "Oder 'Jemand, der Russisch spricht'." },
+                { text: "Der Russisch sprechende Mann", status: "literal", msg: "Klingt sehr technisch." },
+                { text: "Der Mann, sprechend Russisch", status: "wrong", msg: "Grammatisch falsch im Deutschen." }
+            ]
+        }
+    ];
+
+    function initExercise() {
+        const container = document.getElementById('exercise-container');
+        container.innerHTML = '';
+
+        tasks.forEach((task, index) => {
+            const card = document.createElement('div');
+            card.className = 'task-card';
+            card.id = `task-${index}`;
+
+            // Russian Text
+            const ruText = document.createElement('div');
+            ruText.className = 'ru-sentence';
+            ruText.innerHTML = task.russian;
+            card.appendChild(ruText);
+
+            // Options Area
+            const optsContainer = document.createElement('div');
+            optsContainer.className = 'options-container';
+
+            // Feedback Element (hidden initially)
+            const feedbackEl = document.createElement('div');
+            feedbackEl.className = 'feedback-text';
+            feedbackEl.id = `feedback-${index}`;
+
+            // Shuffle Options
+            const shuffled = [...task.options].sort(() => Math.random() - 0.5);
+
+            shuffled.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = opt.text;
+                
+                btn.onclick = function() {
+                    handleSelection(this, opt, index, card, feedbackEl);
+                };
+
+                optsContainer.appendChild(btn);
+            });
+
+            card.appendChild(optsContainer);
+            card.appendChild(feedbackEl);
+            container.appendChild(card);
+        });
+    }
+
+    function handleSelection(btn, optionData, index, card, feedbackEl) {
+        // Reset Feedback display
+        feedbackEl.className = 'feedback-text show';
+        feedbackEl.textContent = optionData.msg;
+
+        // Visual Feedback on Button
+        if (optionData.status === 'best') {
+            btn.className = 'option-btn correct';
+            feedbackEl.classList.add('success');
+            card.classList.add('solved');
+            
+            // Disable other buttons
+            const siblings = card.querySelectorAll('.option-btn');
+            siblings.forEach(sb => {
+                if(sb !== btn) {
+                    sb.style.opacity = '0.5';
+                    sb.style.pointerEvents = 'none';
+                }
+            });
+
+        } else if (optionData.status === 'literal') {
+            btn.className = 'option-btn literal';
+            feedbackEl.classList.add('warning');
+            // User can try again
+        } else {
+            btn.className = 'option-btn wrong';
+            feedbackEl.classList.add('error');
+            // User can try again
+        }
+    }
+
+    function showAllSolutions() {
+        tasks.forEach((task, index) => {
+            const card = document.getElementById(`task-${index}`);
+            if (card.classList.contains('solved')) return;
+
+            const buttons = card.querySelectorAll('.option-btn');
+            const feedbackEl = document.getElementById(`feedback-${index}`);
+
+            buttons.forEach(btn => {
+                // Find button text that matches 'best' option
+                const isBest = task.options.find(o => o.text === btn.textContent && o.status === 'best');
+                
+                if (isBest) {
+                    btn.className = 'option-btn correct';
+                    feedbackEl.textContent = isBest.msg;
+                    feedbackEl.className = 'feedback-text show success';
+                } else {
+                    btn.style.opacity = '0.5';
+                    btn.style.pointerEvents = 'none';
+                    btn.className = 'option-btn'; // Reset other classes
+                }
+            });
+            card.classList.add('solved');
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', initExercise);
+
+</script>
+
+</body>
+</html>
