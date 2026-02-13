@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russisch: Bildung der Partizipien (10 Aufgaben)</title>
+    <style>
+        :root {
+            --primary-color: #3f51b5;
+            --primary-light: #e8eaf6;
+            --success-color: #4caf50;
+            --error-color: #f44336;
+            --text-color: #333;
+            --bg-color: #f0f2f5;
+            --card-bg: #fff;
+            --arrow-color: #90a4ae;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 { color: var(--primary-color); margin-bottom: 5px; }
+        
+        .instruction {
+            background-color: #fff;
+            border-left: 5px solid var(--primary-color);
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* Table/Grid Layout */
+        .morph-table {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Header Row (Desktop only) */
+        .table-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            font-weight: bold;
+            color: #666;
+            padding: 0 20px;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+
+        /* Exercise Row */
+        .verb-row {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr; /* Desktop: 3 Columns */
+            gap: 20px; /* Space between columns */
+            align-items: center;
+            border-left: 5px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .verb-row:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .verb-row.completed {
+            border-left-color: var(--success-color);
+        }
+
+        /* Column Content */
+        .col {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .label-mobile {
+            display: none; /* Hidden on Desktop */
+            font-size: 0.8em;
+            color: #999;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .word-part {
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        /* Inputs / Selects */
+        select {
+            padding: 8px 12px;
+            font-size: 1em;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            background-color: #fafafa;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s, background-color 0.2s;
+            font-family: inherit;
+        }
+
+        select:focus {
+            border-color: var(--primary-color);
+        }
+
+        /* Feedback States for Selects */
+        select.correct {
+            border-color: var(--success-color);
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            pointer-events: none; /* Lock input */
+        }
+
+        select.wrong {
+            border-color: var(--error-color);
+            background-color: #ffebee;
+            color: #c62828;
+            animation: shake 0.4s;
+        }
+
+        /* Arrows between columns */
+        .arrow-separator {
+            display: none; /* Desktop uses grid gap */
+        }
+
+        /* Visual connector lines for desktop logic */
+        .col-2, .col-3 {
+            position: relative;
+        }
+        
+        .col-2::before, .col-3::before {
+            content: "→";
+            position: absolute;
+            left: -15px;
+            color: var(--arrow-color);
+            font-weight: bold;
+        }
+
+        /* Controls */
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        button.control-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: transform 0.1s;
+            color: white;
+            min-width: 160px;
+        }
+        button.control-btn:active { transform: scale(0.98); }
+        .btn-reset { background-color: #ff9800; }
+        .btn-solve { background-color: #9e9e9e; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* MOBILE RESPONSIVENESS */
+        @media (max-width: 700px) {
+            .table-header { display: none; } /* Hide global header */
+            
+            .verb-row {
+                grid-template-columns: 1fr; /* Stack vertically */
+                gap: 15px;
+                position: relative;
+                padding-bottom: 25px;
+            }
+
+            .col-2::before, .col-3::before {
+                content: "↓"; /* Down arrow for mobile stack */
+                left: 50%;
+                top: -18px;
+                transform: translateX(-50%);
+            }
+
+            .col {
+                align-items: center; /* Center text on mobile */
+                text-align: center;
+                background: #f9f9f9;
+                padding: 10px;
+                border-radius: 8px;
+            }
+
+            .label-mobile {
+                display: block; /* Show labels inside cards */
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Russische Grammatik</h1>
+        <p style="color: #666;">Bildung (Morphologie)</p>
+    </header>
+
+    <div class="instruction">
+        <strong>Anleitung:</strong> Bilden Sie das Partizip Schritt für Schritt.
+        <br>1. Wählen Sie die Endung für die 3. Person Plural (sie ...).
+        <br>2. Wählen Sie das passende Partizip-Suffix (das 'т' fällt weg).
+        <br><em>Sofortiges Feedback: Grün = Richtig, Rot = Falsch.</em>
+    </div>
+
+    <div class="table-header">
+        <div>1. Infinitiv</div>
+        <div>2. 3. Person Plural (они)</div>
+        <div>3. Partizip (mask.)</div>
+    </div>
+
+    <div class="morph-table" id="exercise-container">
+        <!-- Rows will be generated by JS -->
+    </div>
+
+    <div class="controls">
+        <button class="control-btn btn-reset" onclick="resetExercise()">Zurücksetzen</button>
+        <button class="control-btn btn-solve" onclick="showSolution()">Lösung anzeigen</button>
+    </div>
+</div>
+
+<script>
+    const verbs = [
+        {
+            inf: "читать",
+            stem1: "они чита",
+            end1: "ют",
+            stem2: "чита",
+            suffix: "ющ", // I. Konj. Vokal
+            end2: "ий"
+        },
+        {
+            inf: "говорить",
+            stem1: "они говор",
+            end1: "ят",
+            stem2: "говор",
+            suffix: "ящ", // II. Konj.
+            end2: "ий"
+        },
+        {
+            inf: "писать",
+            stem1: "они пиш", // Konsonantenwechsel
+            end1: "ут",
+            stem2: "пиш",
+            suffix: "ущ", // I. Konj. Konsonant
+            end2: "ий"
+        },
+        {
+            inf: "любить",
+            stem1: "они люб",
+            end1: "ят",
+            stem2: "люб",
+            suffix: "ящ", // II. Konj.
+            end2: "ий"
+        },
+        {
+            inf: "ждать",
+            stem1: "они жд",
+            end1: "ут",
+            stem2: "жд",
+            suffix: "ущ", // I. Konj. Konsonant
+            end2: "ий"
+        },
+        {
+            inf: "видеть", // Ausnahme II Konj
+            stem1: "они вид",
+            end1: "ят",
+            stem2: "вид",
+            suffix: "ящ",
+            end2: "ий"
+        },
+        {
+            inf: "танцевать", // -ова -> -у
+            stem1: "они танцу",
+            end1: "ют",
+            stem2: "танцу",
+            suffix: "ющ", // I. Konj.
+            end2: "ий"
+        },
+        {
+            inf: "кричать", // Nach Zischlaut a statt я
+            stem1: "они крич",
+            end1: "ат",
+            stem2: "крич",
+            suffix: "ащ", // II. Konj. Zischlaut
+            end2: "ий"
+        },
+        {
+            inf: "нести", // Konsonantenstamm
+            stem1: "они нес",
+            end1: "ут",
+            stem2: "нес",
+            suffix: "ущ", // I. Konj.
+            end2: "ий"
+        },
+        {
+            inf: "смотреть", // Ausnahme II Konj
+            stem1: "они смотр",
+            end1: "ят",
+            stem2: "смотр",
+            suffix: "ящ", // II. Konj.
+            end2: "ий"
+        }
+    ];
+
+    // Optionen für die Dropdowns
+    const endingsPlural = ["ут", "ют", "ат", "ят"];
+    const suffixesParticiple = ["ущ", "ющ", "ащ", "ящ"];
+
+    function initExercise() {
+        const container = document.getElementById('exercise-container');
+        container.innerHTML = '';
+
+        verbs.forEach((verb, index) => {
+            const row = document.createElement('div');
+            row.className = 'verb-row';
+            row.id = `row-${index}`;
+
+            // Col 1: Infinitiv
+            row.innerHTML += `
+                <div class="col col-1">
+                    <span class="label-mobile">1. Infinitiv</span>
+                    <div class="word-part"><strong>${verb.inf}</strong></div>
+                </div>
+            `;
+
+            // Col 2: 3. Pers Pl
+            const sel1 = createSelect(endingsPlural, verb.end1);
+            row.innerHTML += `
+                <div class="col col-2">
+                    <span class="label-mobile">2. они ...</span>
+                    <div class="word-part">
+                        ${verb.stem1}<div class="select-wrapper" id="wrap1-${index}"></div>
+                    </div>
+                </div>
+            `;
+
+            // Col 3: Partizip
+            const sel2 = createSelect(suffixesParticiple, verb.suffix);
+            row.innerHTML += `
+                <div class="col col-3">
+                    <span class="label-mobile">3. Partizip</span>
+                    <div class="word-part">
+                        ${verb.stem2}<div class="select-wrapper" id="wrap2-${index}"></div>ий
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(row);
+
+            // Selects nachträglich einfügen, damit wir Eventlistener haben
+            document.getElementById(`wrap1-${index}`).appendChild(sel1);
+            document.getElementById(`wrap2-${index}`).appendChild(sel2);
+        });
+    }
+
+    function createSelect(options, correctAnswer) {
+        const select = document.createElement('select');
+        
+        const defaultOpt = document.createElement('option');
+        defaultOpt.value = "";
+        defaultOpt.text = "?";
+        defaultOpt.disabled = true;
+        defaultOpt.selected = true;
+        select.appendChild(defaultOpt);
+
+        options.sort().forEach(opt => {
+            const el = document.createElement('option');
+            el.value = opt;
+            el.text = "-" + opt; // Bindestrich für visuelle Verbindung
+            select.appendChild(el);
+        });
+
+        // Event Listener
+        select.addEventListener('change', function() {
+            if (this.value === correctAnswer) {
+                this.className = 'correct';
+                checkRowCompletion(this);
+            } else {
+                this.className = 'wrong';
+            }
+        });
+
+        select.dataset.correct = correctAnswer;
+        return select;
+    }
+
+    function checkRowCompletion(selectElement) {
+        // Finde die Reihe
+        const row = selectElement.closest('.verb-row');
+        const selects = row.querySelectorAll('select');
+        let allCorrect = true;
+        selects.forEach(s => {
+            if (!s.classList.contains('correct')) allCorrect = false;
+        });
+
+        if (allCorrect) {
+            row.classList.add('completed');
+        }
+    }
+
+    function resetExercise() {
+        const selects = document.querySelectorAll('select');
+        selects.forEach(s => {
+            s.value = "";
+            s.className = "";
+            s.disabled = false;
+        });
+        const rows = document.querySelectorAll('.verb-row');
+        rows.forEach(r => r.classList.remove('completed'));
+    }
+
+    function showSolution() {
+        const selects = document.querySelectorAll('select');
+        selects.forEach(s => {
+            s.value = s.dataset.correct;
+            s.className = 'correct';
+        });
+        const rows = document.querySelectorAll('.verb-row');
+        rows.forEach(r => r.classList.add('completed'));
+    }
+
+    document.addEventListener('DOMContentLoaded', initExercise);
+
+</script>
+
+</body>
+</html>
