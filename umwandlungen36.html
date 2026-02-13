@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russisch: Transformation (Который -> Partizip)</title>
+    <style>
+        :root {
+            --primary-color: #1976d2; /* Kräftiges Blau */
+            --primary-light: #bbdefb;
+            --accent-color: #ff9800;
+            --success-color: #4caf50;
+            --error-color: #f44336;
+            --text-color: #333;
+            --bg-color: #f0f4f8;
+            --card-bg: #fff;
+            --highlight-old: #ffebee; /* Rotstich für "alt" */
+            --highlight-new: #e8f5e9; /* Grünstich für "neu" */
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        h1 { color: var(--primary-color); margin-bottom: 5px; }
+        
+        .instruction {
+            background-color: #fff;
+            border-left: 5px solid var(--primary-color);
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* Exercise Cards */
+        .exercise-list {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .transform-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid #e0e0e0;
+            transition: transform 0.2s;
+        }
+
+        .transform-card:hover {
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        .transform-card.solved {
+            border-color: var(--success-color);
+            border-width: 2px;
+        }
+
+        /* Sentence Blocks */
+        .sentence-block {
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            position: relative;
+        }
+
+        .sentence-original {
+            background-color: #f5f5f5;
+            color: #555;
+            font-size: 1.1em;
+            border-left: 4px solid #9e9e9e;
+        }
+
+        .highlight-rel {
+            text-decoration: line-through;
+            text-decoration-color: var(--error-color);
+            color: #757575;
+        }
+
+        .arrow-divider {
+            text-align: center;
+            font-size: 1.5em;
+            color: var(--primary-color);
+            margin: -5px 0;
+            user-select: none;
+        }
+
+        .sentence-transformed {
+            background-color: var(--highlight-new);
+            color: #000;
+            font-size: 1.2em;
+            font-weight: 500;
+            border-left: 4px solid var(--success-color);
+        }
+
+        /* The Gap */
+        .gap-spot {
+            display: inline-block;
+            min-width: 100px;
+            border-bottom: 2px dashed var(--primary-color);
+            color: var(--primary-color);
+            text-align: center;
+            cursor: default;
+            padding: 0 5px;
+        }
+
+        .gap-spot.filled {
+            border-bottom: none;
+            color: var(--success-color);
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+        /* Options */
+        .options-area {
+            margin-top: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center; /* Center buttons */
+        }
+
+        .option-chip {
+            background: #fff;
+            border: 2px solid #cfd8dc;
+            border-radius: 25px;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            color: #455a64;
+        }
+
+        .option-chip:hover {
+            background-color: #eceff1;
+            border-color: #90a4ae;
+        }
+
+        /* Feedback States */
+        .option-chip.correct {
+            background-color: var(--success-color) !important;
+            border-color: var(--success-color) !important;
+            color: white !important;
+            pointer-events: none;
+        }
+
+        .option-chip.wrong {
+            background-color: var(--error-color) !important;
+            border-color: var(--error-color) !important;
+            color: white !important;
+            animation: shake 0.4s;
+        }
+
+        .transform-card.solved .options-area {
+            /* Hide wrong options when solved? Or just disable. Let's disable. */
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        /* Controls */
+        .controls {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        button.control-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: transform 0.1s;
+            color: white;
+            min-width: 160px;
+        }
+        button.control-btn:active { transform: scale(0.98); }
+        .btn-reset { background-color: #ff9800; }
+        .btn-solve { background-color: #9e9e9e; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @media (max-width: 600px) {
+            .options-area {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .option-chip { text-align: center; }
+            .controls { flex-direction: column; }
+            button.control-btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Russische Grammatik</h1>
+        <p style="color: #666;">Syntax & Transformation</p>
+    </header>
+
+    <div class="instruction">
+        <strong>Aufgabe:</strong> Wandeln Sie den Satz mit „который“ in eine Partizipialkonstruktion um.
+        <br>Wählen Sie unten die Form, die grammatikalisch (Fall, Zahl, Geschlecht) in die Lücke passt.
+    </div>
+
+    <div class="exercise-list" id="exercise-container">
+        <!-- JS generates content here -->
+    </div>
+
+    <div class="controls">
+        <button class="control-btn btn-reset" onclick="initExercise()">Zurücksetzen</button>
+        <button class="control-btn btn-solve" onclick="showAllSolutions()">Lösung anzeigen</button>
+    </div>
+</div>
+
+<script>
+    const data = [
+        {
+            origPre: "Студент, ",
+            origRel: "который читает",
+            origPost: " книгу, мой друг.",
+            transPre: "Студент, ",
+            correct: "читающий",
+            transPost: " книгу, мой друг.",
+            options: ["читающий", "читающего", "читающем"] // Nom. Mask.
+        },
+        {
+            origPre: "Я вижу девушку, ",
+            origRel: "которая танцует",
+            origPost: " на сцене.",
+            transPre: "Я вижу девушку, ",
+            correct: "танцующую",
+            transPost: " на сцене.",
+            options: ["танцующая", "танцующую", "танцующей"] // Akk. Fem.
+        },
+        {
+            origPre: "Мы помогаем людям, ",
+            origRel: "которые живут",
+            origPost: " здесь.",
+            transPre: "Мы помогаем людям, ",
+            correct: "живущим",
+            transPost: " здесь.",
+            options: ["живущих", "живущим", "живущими"] // Dat. Pl.
+        },
+        {
+            origPre: "В доме нет человека, ",
+            origRel: "который знает",
+            origPost: " ответ.",
+            transPre: "В доме нет человека, ",
+            correct: "знающего",
+            transPost: " ответ.",
+            options: ["знающий", "знающего", "знающему"] // Gen. Mask.
+        },
+        {
+            origPre: "Они говорят о фильме, ",
+            origRel: "который идёт",
+            origPost: " в кино.",
+            transPre: "Они говорят о фильме, ",
+            correct: "идущем",
+            transPost: " в кино.",
+            options: ["идущем", "идущий", "идущим"] // Präp. Mask.
+        },
+        {
+            origPre: "Вот письмо от подруги, ",
+            origRel: "которая живёт",
+            origPost: " в Москве.",
+            transPre: "Вот письмо от подруги, ",
+            correct: "живущей",
+            transPost: " в Москве.",
+            options: ["живущая", "живущей", "живущую"] // Gen. Fem.
+        },
+        {
+            origPre: "Я знаю мальчиков, ",
+            origRel: "которые играют",
+            origPost: " в футбол.",
+            transPre: "Я знаю мальчиков, ",
+            correct: "играющих",
+            transPost: " в футбол.",
+            options: ["играющие", "играющих", "играющими"] // Akk. Pl. (Belebt) -> Genitiv
+        },
+        {
+            origPre: "Мы любуемся солнцем, ",
+            origRel: "которое заходит",
+            origPost: " за гору.",
+            transPre: "Мы любуемся солнцем, ",
+            correct: "заходящим",
+            transPost: " за гору.",
+            options: ["заходящим", "заходящем", "заходящее"] // Instr. Neut.
+        }
+    ];
+
+    function initExercise() {
+        const container = document.getElementById('exercise-container');
+        container.innerHTML = '';
+
+        data.forEach((item, index) => {
+            const card = document.createElement('div');
+            card.className = 'transform-card';
+            card.id = `card-${index}`;
+
+            // 1. Original Sentence
+            const origBlock = document.createElement('div');
+            origBlock.className = 'sentence-block sentence-original';
+            origBlock.innerHTML = `${item.origPre}<span class="highlight-rel">${item.origRel}</span>${item.origPost}`;
+            card.appendChild(origBlock);
+
+            // Arrow
+            const arrow = document.createElement('div');
+            arrow.className = 'arrow-divider';
+            arrow.innerHTML = '↓';
+            card.appendChild(arrow);
+
+            // 2. Transformed Sentence with Gap
+            const transBlock = document.createElement('div');
+            transBlock.className = 'sentence-block sentence-transformed';
+            transBlock.innerHTML = `${item.transPre}<span class="gap-spot" id="gap-${index}">.......</span>${item.transPost}`;
+            card.appendChild(transBlock);
+
+            // 3. Options
+            const optionsArea = document.createElement('div');
+            optionsArea.className = 'options-area';
+
+            // Shuffle options
+            const shuffled = [...item.options].sort(() => Math.random() - 0.5);
+
+            shuffled.forEach(opt => {
+                const chip = document.createElement('div');
+                chip.className = 'option-chip';
+                chip.textContent = opt;
+                chip.onclick = function() {
+                    checkAnswer(this, opt, item.correct, index);
+                };
+                optionsArea.appendChild(chip);
+            });
+
+            card.appendChild(optionsArea);
+            container.appendChild(card);
+        });
+    }
+
+    function checkAnswer(chip, selected, correct, index) {
+        const card = document.getElementById(`card-${index}`);
+        if (card.classList.contains('solved')) return; // Prevent changing after success
+
+        if (selected === correct) {
+            // Right
+            chip.classList.add('correct');
+            card.classList.add('solved');
+            
+            // Fill Gap
+            const gap = document.getElementById(`gap-${index}`);
+            gap.textContent = correct;
+            gap.classList.add('filled');
+
+            // Fade out other options
+            const allChips = card.querySelectorAll('.option-chip');
+            allChips.forEach(c => {
+                if(c !== chip) c.style.opacity = '0.5';
+                c.style.cursor = 'default';
+            });
+
+        } else {
+            // Wrong
+            chip.classList.add('wrong');
+            // User can try again
+        }
+    }
+
+    function showAllSolutions() {
+        data.forEach((item, index) => {
+            const card = document.getElementById(`card-${index}`);
+            if (card.classList.contains('solved')) return;
+
+            // Find correct chip
+            const chips = card.querySelectorAll('.option-chip');
+            let correctChip;
+            chips.forEach(c => {
+                if (c.textContent === item.correct) correctChip = c;
+            });
+
+            if (correctChip) {
+                // Simulate click logic
+                correctChip.classList.add('correct');
+                card.classList.add('solved');
+                const gap = document.getElementById(`gap-${index}`);
+                gap.textContent = item.correct;
+                gap.classList.add('filled');
+                
+                chips.forEach(c => {
+                    if(c !== correctChip) c.style.opacity = '0.5';
+                });
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', initExercise);
+
+</script>
+
+</body>
+</html>
