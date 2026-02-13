@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russisch: Partizipien im Text erkennen</title>
+    <style>
+        :root {
+            --primary-color: #3f51b5;
+            --primary-light: #e8eaf6;
+            --success-color: #4caf50;
+            --error-color: #f44336;
+            --missed-color: #ff9800;
+            --text-color: #333;
+            --bg-color: #f5f5f5;
+            --card-bg: #fff;
+            --selection-color: #bbdefb;
+            --selection-border: #2196f3;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 { color: var(--primary-color); margin-bottom: 10px; }
+        p.subtitle { color: #666; font-size: 1.1em; }
+
+        .exercise-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        /* Text Area Styling */
+        .text-content {
+            font-size: 1.25em; /* Größere Schrift für bessere Lesbarkeit auf Mobile */
+            line-height: 2.2; /* Großer Zeilenabstand für Touch-Ziele */
+            text-align: justify;
+            color: #444;
+        }
+
+        /* Interactive Word Styling */
+        .word {
+            display: inline-block;
+            padding: 2px 6px;
+            margin: 0 1px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+            user-select: none; /* Verhindert Textmarkierung beim Doppelklick */
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .word:hover {
+            background-color: #f0f0f0;
+        }
+
+        /* States */
+        .word.selected {
+            background-color: var(--selection-color);
+            border-color: var(--selection-border);
+            color: #0d47a1;
+            font-weight: 500;
+        }
+
+        .word.correct {
+            background-color: #c8e6c9 !important;
+            border-color: var(--success-color) !important;
+            color: #2e7d32 !important;
+            position: relative;
+        }
+        
+        .word.correct::after {
+            content: "✓";
+            font-size: 0.7em;
+            position: absolute;
+            top: -10px;
+            right: -5px;
+            color: var(--success-color);
+            font-weight: bold;
+        }
+
+        .word.wrong {
+            background-color: #ffcdd2 !important;
+            border-color: var(--error-color) !important;
+            color: #c62828 !important;
+            text-decoration: line-through;
+        }
+
+        .word.missed {
+            border: 2px dashed var(--missed-color) !important;
+            color: var(--missed-color) !important;
+            font-weight: bold;
+        }
+
+        /* Buttons */
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.1s, box-shadow 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        button:active { transform: scale(0.98); }
+
+        .btn-check { background-color: var(--primary-color); color: white; }
+        .btn-reset { background-color: #ff9800; color: white; }
+        .btn-solve { background-color: #9e9e9e; color: white; }
+
+        /* Legende */
+        .legend {
+            margin-top: 20px;
+            font-size: 0.9em;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            color: #666;
+        }
+        .legend-item { display: flex; align-items: center; gap: 5px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+
+        @media (max-width: 600px) {
+            .text-content {
+                font-size: 1.1em;
+                line-height: 2;
+                text-align: left; /* Besser für kleine Bildschirme */
+            }
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            button { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Russische Grammatik</h1>
+        <p class="subtitle">Thema: Aktive Partizipien der Gegenwart</p>
+    </header>
+
+    <div class="exercise-card">
+        <h2>Aufgabe: Im Text finden</h2>
+        <p>Lesen Sie den Text. Klicken oder tippen Sie auf <strong>alle aktiven Partizipien der Gegenwart</strong> (Wörter mit den Suffixen -ущ/-ющ oder -ащ/-ящ), um sie zu markieren.</p>
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+        
+        <div class="text-content" id="text-area">
+            <!-- Der Text wird via JS generiert, um die Spans sauber zu halten, 
+                 oder man schreibt ihn hier direkt mit Spans.
+                 Wir nutzen hier eine direkte HTML Struktur für maximale Kontrolle. -->
+            
+            <span class="word">Сегодня</span>
+            <span class="word">прекрасный</span>
+            <span class="word">день.</span>
+            <span class="word">Мы</span>
+            <span class="word">гуляем</span>
+            <span class="word">в</span>
+            <span class="word">парке</span>
+            <span class="word">и</span>
+            <span class="word">видим</span>
+            <span class="word">много</span>
+            <span class="word">людей.</span>
+            <span class="word">Вот</span>
+            <span class="word">девушка,</span>
+            <!-- Zielwort 1: читающая -->
+            <span class="word" data-is-target="true">читающая</span>
+            <span class="word">книгу</span>
+            <span class="word">на</span>
+            <span class="word">скамейке.</span>
+            <span class="word">Рядом</span>
+            <span class="word">бегают</span>
+            <span class="word">дети,</span>
+            <!-- Zielwort 2: играющие -->
+            <span class="word" data-is-target="true">играющие</span>
+            <span class="word">в</span>
+            <span class="word">мяч.</span>
+            <span class="word">Их</span>
+            <span class="word">родители,</span>
+            <!-- Zielwort 3: сидящие -->
+            <span class="word" data-is-target="true">сидящие</span>
+            <span class="word">в</span>
+            <span class="word">кафе,</span>
+            <span class="word">пьют</span>
+            <span class="word">кофе.</span>
+            <span class="word">На</span>
+            <span class="word">дереве</span>
+            <span class="word">мы</span>
+            <span class="word">слышим</span>
+            <span class="word">птиц,</span>
+            <!-- Zielwort 4: поющих -->
+            <span class="word" data-is-target="true">поющих</span>
+            <span class="word">весёлые</span>
+            <span class="word">песни.</span>
+            <span class="word">Мимо</span>
+            <span class="word">проходит</span>
+            <span class="word">турист,</span>
+            <!-- Zielwort 5: ищущий -->
+            <span class="word" data-is-target="true">ищущий</span>
+            <span class="word">музей.</span>
+            <span class="word">Это</span>
+            <span class="word">город,</span>
+            <!-- Zielwort 6: живущий -->
+            <span class="word" data-is-target="true">живущий</span>
+            <span class="word">своей</span>
+            <span class="word">жизнью.</span>
+        </div>
+
+        <div class="controls">
+            <button class="btn-check" onclick="checkText()">Überprüfen</button>
+            <button class="btn-reset" onclick="resetText()">Zurücksetzen</button>
+            <button class="btn-solve" onclick="solveText()">Lösung anzeigen</button>
+        </div>
+
+        <div class="legend" id="status-legend" style="display:none; opacity: 0; transition: opacity 0.5s;">
+            <div class="legend-item"><div class="dot" style="background:#c8e6c9; border:1px solid green;"></div> Richtig</div>
+            <div class="legend-item"><div class="dot" style="background:#ffcdd2; border:1px solid red;"></div> Falsch</div>
+            <div class="legend-item"><div class="dot" style="border:2px dashed orange;"></div> Vergessen</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Selektiere alle Wörter
+    const words = document.querySelectorAll('.word');
+    const legend = document.getElementById('status-legend');
+
+    // Event Listener für Klicks hinzufügen
+    words.forEach(word => {
+        word.addEventListener('click', function() {
+            // Wenn die Überprüfung bereits lief (Klassen vorhanden sind), setze erst zurück
+            if (this.classList.contains('correct') || this.classList.contains('wrong') || this.classList.contains('missed')) {
+               // Optional: Auto-Reset bei Klick nach Check verhindern oder erlauben.
+               // Hier erlauben wir nur Toggle, wenn nicht im "Checked"-Modus, 
+               // oder wir entfernen einfach alle Feedback-Klassen bei neuer Interaktion.
+               removeFeedback();
+            }
+            
+            // Toggle 'selected' Klasse
+            this.classList.toggle('selected');
+        });
+    });
+
+    function removeFeedback() {
+        words.forEach(w => {
+            w.classList.remove('correct', 'wrong', 'missed');
+        });
+        legend.style.opacity = '0';
+        setTimeout(() => legend.style.display = 'none', 500);
+    }
+
+    function checkText() {
+        let correctCount = 0;
+        let totalTargets = 0;
+
+        words.forEach(word => {
+            const isTarget = word.getAttribute('data-is-target') === 'true';
+            const isSelected = word.classList.contains('selected');
+
+            // Feedback Klassen anwenden
+            word.classList.remove('correct', 'wrong', 'missed'); // Clean state first within check logic
+
+            if (isTarget) {
+                totalTargets++;
+                if (isSelected) {
+                    word.classList.add('correct');
+                    correctCount++;
+                } else {
+                    word.classList.add('missed');
+                }
+            } else {
+                if (isSelected) {
+                    word.classList.add('wrong');
+                }
+            }
+        });
+
+        // Legende anzeigen
+        legend.style.display = 'flex';
+        // Kurzer Timeout für Fade-In Effekt
+        setTimeout(() => legend.style.opacity = '1', 50);
+    }
+
+    function resetText() {
+        words.forEach(word => {
+            word.classList.remove('selected', 'correct', 'wrong', 'missed');
+        });
+        removeFeedback();
+    }
+
+    function solveText() {
+        resetText(); // Erst alles säubern
+        words.forEach(word => {
+            if (word.getAttribute('data-is-target') === 'true') {
+                word.classList.add('selected'); // Visuell als "ausgewählt" markieren
+                word.classList.add('correct');  // Und als korrekt bestätigen
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
