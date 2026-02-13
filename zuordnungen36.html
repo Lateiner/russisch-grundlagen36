@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russisch: KNG-Kongruenz (Drag & Drop)</title>
+    <!-- Polyfill für Touch-Support auf Smartphones/Tablets -->
+    <script src="https://cdn.jsdelivr.net/npm/drag-drop-touch@1.3.1/DragDropTouch.js"></script>
+    <style>
+        :root {
+            --primary-color: #e91e63; /* Pink/Rot-Ton */
+            --primary-light: #f8bbd0;
+            --success-color: #4caf50;
+            --error-color: #f44336;
+            --text-color: #333;
+            --bg-color: #fff0f5; /* Leichtes Rosa */
+            --card-bg: #fff;
+            --pool-bg: #eceff1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        h1 { color: var(--primary-color); margin-bottom: 5px; }
+        
+        .instruction {
+            background-color: #fff;
+            border-left: 5px solid var(--primary-color);
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* --- DRAGGABLE POOL (OBEN) --- */
+        .pool-container {
+            background-color: var(--pool-bg);
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px dashed #b0bec5;
+            margin-bottom: 30px;
+            min-height: 60px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .draggable {
+            background: #fff;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: grab;
+            font-weight: bold;
+            font-size: 1.1em;
+            user-select: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .draggable:active {
+            cursor: grabbing;
+        }
+
+        .draggable.dragging {
+            opacity: 0.5;
+            transform: scale(1.05);
+        }
+
+        /* Feedback Styles on Draggables inside Dropzones */
+        .draggable.correct {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+            color: white;
+            cursor: default;
+        }
+        
+        .draggable.wrong {
+            background-color: var(--error-color);
+            border-color: var(--error-color);
+            color: white;
+            animation: shake 0.4s;
+        }
+
+        /* --- SENTENCE LIST (UNTEN) --- */
+        .sentence-container {
+            display: grid;
+            grid-template-columns: 1fr; /* Mobile: 1 Col */
+            gap: 15px;
+        }
+
+        /* Tablet/Desktop: 2 Spalten für die Sätze */
+        @media (min-width: 768px) {
+            .sentence-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .sentence-card {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column; /* Mobile: Stack text and dropzone */
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .context-text {
+            font-size: 1.1em;
+        }
+
+        .highlight-noun {
+            font-weight: bold;
+            background-color: var(--primary-light);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #880e4f;
+        }
+
+        .hint {
+            font-size: 0.85em;
+            color: #777;
+            font-style: italic;
+            margin-left: 5px;
+        }
+
+        /* --- DROP ZONES --- */
+        .dropzone {
+            width: 100%;
+            min-height: 45px;
+            background-color: #f5f5f5;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        /* Hover-Effekt beim Draggen */
+        .dropzone.drag-over {
+            background-color: var(--primary-light);
+            border-color: var(--primary-color);
+            border-style: dashed;
+        }
+
+        /* Controls */
+        .controls {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        button.control-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: transform 0.1s;
+            color: white;
+            min-width: 160px;
+        }
+        button.control-btn:active { transform: scale(0.98); }
+        .btn-reset { background-color: #ff9800; }
+        .btn-solve { background-color: #9e9e9e; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Russische Grammatik</h1>
+        <p style="color: #666;">KNG-Kongruenz (Drag & Drop)</p>
+    </header>
+
+    <div class="instruction">
+        <strong>Aufgabe:</strong> Ziehen Sie das passende Partizip aus dem oberen Kasten in das Feld neben dem Substantiv.
+        <br>Achten Sie auf Fall, Geschlecht und Zahl!
+        <br><em>Sofortiges Feedback beim Ablegen.</em>
+    </div>
+
+    <!-- 1. Der Pool mit den Antworten -->
+    <div class="pool-container" id="source-pool">
+        <!-- Draggables will be inserted here -->
+    </div>
+
+    <!-- 2. Die Liste mit den Aufgaben -->
+    <div class="sentence-container" id="target-list">
+        <!-- Dropzones will be inserted here -->
+    </div>
+
+    <div class="controls">
+        <button class="control-btn btn-reset" onclick="initGame()">Zurücksetzen</button>
+        <button class="control-btn btn-solve" onclick="showAllSolutions()">Lösung anzeigen</button>
+    </div>
+</div>
+
+<script>
+    // Wir verwenden ein einziges Verb (z.B. играющий - spielend), 
+    // um den Fokus rein auf die Endungen zu legen.
+    const data = [
+        {
+            nounPhrase: "Это <span class='highlight-noun'>мальчик</span> (Nom. m)",
+            participle: "играющий",
+            id: "nom_m"
+        },
+        {
+            nounPhrase: "Нет <span class='highlight-noun'>мальчика</span> (Gen. m)",
+            participle: "играющего",
+            id: "gen_m"
+        },
+        {
+            nounPhrase: "Дал <span class='highlight-noun'>мальчику</span> (Dat. m)",
+            participle: "играющему",
+            id: "dat_m"
+        },
+        {
+            nounPhrase: "Это <span class='highlight-noun'>девочка</span> (Nom. f)",
+            participle: "играющая",
+            id: "nom_f"
+        },
+        {
+            nounPhrase: "Вижу <span class='highlight-noun'>девочку</span> (Akk. f)",
+            participle: "играющую",
+            id: "akk_f"
+        },
+        {
+            nounPhrase: "С <span class='highlight-noun'>девочкой</span> (Instr. f)",
+            participle: "играющей",
+            id: "instr_f"
+        },
+        {
+            nounPhrase: "Это <span class='highlight-noun'>дети</span> (Nom. Pl)",
+            participle: "играющие",
+            id: "nom_pl"
+        },
+        {
+            nounPhrase: "Нет <span class='highlight-noun'>детей</span> (Gen. Pl)",
+            participle: "играющих",
+            id: "gen_pl"
+        },
+        {
+            nounPhrase: "Иду к <span class='highlight-noun'>детям</span> (Dat. Pl)",
+            participle: "играющим",
+            id: "dat_pl"
+        },
+        {
+            nounPhrase: "С <span class='highlight-noun'>детьми</span> (Instr. Pl)",
+            participle: "играющими",
+            id: "instr_pl"
+        }
+    ];
+
+    let draggedItem = null;
+
+    function initGame() {
+        const sourcePool = document.getElementById('source-pool');
+        const targetList = document.getElementById('target-list');
+        
+        sourcePool.innerHTML = '';
+        targetList.innerHTML = '';
+
+        // 1. Erstelle die Liste der Sätze (Targets)
+        data.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'sentence-card';
+            
+            const textDiv = document.createElement('div');
+            textDiv.className = 'context-text';
+            textDiv.innerHTML = item.nounPhrase; // HTML für Highlight
+
+            const dropzone = document.createElement('div');
+            dropzone.className = 'dropzone';
+            dropzone.dataset.targetId = item.id;
+
+            // Events für Dropzone
+            dropzone.addEventListener('dragover', handleDragOver);
+            dropzone.addEventListener('dragenter', handleDragEnter);
+            dropzone.addEventListener('dragleave', handleDragLeave);
+            dropzone.addEventListener('drop', handleDrop);
+
+            card.appendChild(textDiv);
+            card.appendChild(dropzone);
+            targetList.appendChild(card);
+        });
+
+        // 2. Erstelle die Draggables (Shuffle)
+        const shuffledData = [...data].sort(() => Math.random() - 0.5);
+
+        shuffledData.forEach(item => {
+            const el = document.createElement('div');
+            el.className = 'draggable';
+            el.draggable = true;
+            el.textContent = item.participle;
+            el.dataset.id = item.id;
+
+            // Drag Events
+            el.addEventListener('dragstart', handleDragStart);
+            el.addEventListener('dragend', handleDragEnd);
+
+            sourcePool.appendChild(el);
+        });
+    }
+
+    /* --- Drag & Drop Handler --- */
+
+    function handleDragStart(e) {
+        draggedItem = this;
+        this.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        // Für Firefox muss manchmal dataTransfer gesetzt werden
+        e.dataTransfer.setData('text/plain', this.dataset.id);
+    }
+
+    function handleDragEnd(e) {
+        this.classList.remove('dragging');
+        draggedItem = null;
+        
+        // Aufräumen von Highlight-Klassen
+        document.querySelectorAll('.dropzone').forEach(zone => {
+            zone.classList.remove('drag-over');
+        });
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault(); // Nötig um Drop zu erlauben
+        e.dataTransfer.dropEffect = 'move';
+    }
+
+    function handleDragEnter(e) {
+        e.preventDefault();
+        if (!this.contains(draggedItem)) { // Verhindert Flackern
+             this.classList.add('drag-over');
+        }
+    }
+
+    function handleDragLeave(e) {
+        this.classList.remove('drag-over');
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        this.classList.remove('drag-over');
+
+        if (draggedItem) {
+            // Logik: Ist die Zone leer?
+            if (this.children.length > 0) {
+                // Tausche Items (wenn man möchte) oder sende das alte zurück?
+                // Einfachste Lösung: Sende das alte Item zurück in den Pool
+                const oldItem = this.children[0];
+                resetItemStyle(oldItem);
+                document.getElementById('source-pool').appendChild(oldItem);
+            }
+
+            // Item hier einfügen
+            this.appendChild(draggedItem);
+
+            // Sofortiges Feedback
+            checkPlacement(draggedItem, this);
+        }
+    }
+
+    function checkPlacement(item, zone) {
+        const itemId = item.dataset.id;
+        const targetId = zone.dataset.targetId;
+
+        item.classList.remove('correct', 'wrong');
+
+        if (itemId === targetId) {
+            item.classList.add('correct');
+            item.draggable = false; // Sperren wenn richtig
+        } else {
+            item.classList.add('wrong');
+            // Optional: Nach kurzer Zeit resetten oder rot lassen?
+            // Wir lassen es rot, damit der User sieht "Ups, falsch".
+            // Er kann es ja wieder wegziehen.
+        }
+    }
+
+    function resetItemStyle(item) {
+        item.classList.remove('correct', 'wrong');
+        item.draggable = true;
+    }
+
+    /* --- Controls --- */
+
+    function showAllSolutions() {
+        // Zuerst alles resetten (zurück in den Pool)
+        // Aber wir machen es cleverer: Wir gehen durch die Daten und ordnen zu.
+        
+        const sourcePool = document.getElementById('source-pool');
+        const draggables = document.querySelectorAll('.draggable');
+        const zones = document.querySelectorAll('.dropzone');
+
+        // Mappe ID zu DOM Element
+        const itemMap = {};
+        draggables.forEach(d => {
+            resetItemStyle(d);
+            itemMap[d.dataset.id] = d;
+        });
+
+        // Verteile auf Zonen
+        zones.forEach(zone => {
+            const targetId = zone.dataset.targetId;
+            const correctItem = itemMap[targetId];
+            
+            if (correctItem) {
+                zone.appendChild(correctItem);
+                correctItem.classList.add('correct');
+                correctItem.draggable = false;
+            }
+        });
+    }
+
+    // Start
+    document.addEventListener('DOMContentLoaded', initGame);
+
+</script>
+
+</body>
+</html>
