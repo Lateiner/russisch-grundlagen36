@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Russisch: Satzbau (Sofortiges Feedback)</title>
+    <style>
+        :root {
+            --primary-color: #00838f; /* Cyan/Teal dunkel */
+            --primary-light: #e0f7fa;
+            --success-color: #4caf50;
+            --success-bg: #e8f5e9;
+            --error-color: #f44336;
+            --error-bg: #ffebee;
+            --text-color: #333;
+            --bg-color: #f0f4c3; /* Helles Limettengrün */
+            --card-bg: #fff;
+            --word-bg: #fff;
+            --word-border: #00838f;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        h1 { color: var(--primary-color); margin-bottom: 5px; }
+        
+        .instruction {
+            background-color: #fff;
+            border-left: 5px solid var(--primary-color);
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* Exercise List */
+        .exercise-list {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .task-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid #e0e0e0;
+        }
+
+        .task-number {
+            font-weight: bold;
+            color: #777;
+            margin-bottom: 10px;
+            display: block;
+            font-size: 0.9em;
+        }
+
+        /* Areas */
+        .sentence-area {
+            min-height: 60px;
+            background-color: var(--primary-light);
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .sentence-area.fully-correct {
+            background-color: var(--success-bg);
+            border-color: var(--success-color);
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+        }
+
+        .pool-area {
+            min-height: 60px;
+            background-color: #eceff1;
+            border: 2px dashed #b0bec5;
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        /* Word Chips */
+        .word-chip {
+            background: var(--word-bg);
+            border: 1px solid var(--word-border);
+            color: var(--primary-color);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 1.1em;
+            cursor: pointer;
+            user-select: none;
+            box-shadow: 0 2px 2px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .word-chip:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Feedback States for Chips inside Sentence Area */
+        .word-chip.status-correct {
+            background-color: var(--success-bg);
+            border-color: var(--success-color);
+            color: #2e7d32;
+        }
+
+        .word-chip.status-wrong {
+            background-color: var(--error-bg);
+            border-color: var(--error-color);
+            color: #c62828;
+            animation: shake 0.3s;
+        }
+
+        /* Controls */
+        .controls {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        button.control-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: transform 0.1s;
+            color: white;
+            min-width: 160px;
+        }
+        button.control-btn:active { transform: scale(0.98); }
+        .btn-reset { background-color: #ff9800; }
+        .btn-solve { background-color: #9e9e9e; }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-3px); }
+            75% { transform: translateX(3px); }
+        }
+
+        @media (max-width: 600px) {
+            .controls { flex-direction: column; }
+            button.control-btn { width: 100%; }
+            .word-chip { font-size: 1em; padding: 6px 10px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Russische Grammatik</h1>
+        <p style="color: #666;">Satzbaukasten (Sofortiges Feedback)</p>
+    </header>
+
+    <div class="instruction">
+        <strong>Aufgabe:</strong> Bauen Sie korrekte Sätze.
+        <br>1. Klicken Sie auf die Wörter im grauen Kasten.
+        <br>2. <strong>Grün</strong> = Wort ist an der richtigen Stelle.
+        <br>3. <strong>Rot</strong> = Wort ist an der falschen Stelle (klicken Sie es an, um es zurückzulegen).
+    </div>
+
+    <div class="exercise-list" id="exercise-container">
+        <!-- JS generiert hier die Aufgaben -->
+    </div>
+
+    <div class="controls">
+        <button class="control-btn btn-reset" onclick="initExercise()">Zurücksetzen</button>
+        <button class="control-btn btn-solve" onclick="showAllSolutions()">Lösung anzeigen</button>
+    </div>
+</div>
+
+<script>
+    const tasks = [
+        {
+            // "Туристы, посещающие музей, довольны."
+            parts: ["Туристы,", "посещающие", "музей,", "довольны."],
+            correctOrder: [0, 1, 2, 3] 
+        },
+        {
+            // "Читающая книгу девушка улыбается."
+            parts: ["Читающая", "книгу", "девушка", "улыбается."],
+            correctOrder: [0, 1, 2, 3]
+        },
+        {
+            // "Я вижу автобус, идущий в центр."
+            parts: ["Я", "вижу", "автобус,", "идущий", "в", "центр."],
+            correctOrder: [0, 1, 2, 3, 4, 5]
+        },
+        {
+            // "Играющие во дворе дети смеются."
+            parts: ["Играющие", "во", "дворе", "дети", "смеются."],
+            correctOrder: [0, 1, 2, 3, 4]
+        },
+        {
+            // "Мы, живущие в Берлине, любим этот город."
+            parts: ["Мы,", "живущие", "в", "Берлине,", "любим", "этот", "город."],
+            correctOrder: [0, 1, 2, 3, 4, 5, 6]
+        },
+        {
+            // "Он разговаривает с людьми, знающими правду."
+            parts: ["Он", "разговаривает", "с", "людьми,", "знающими", "правду."],
+            correctOrder: [0, 1, 2, 3, 4, 5]
+        }
+    ];
+
+    let currentTasks = [];
+
+    function initExercise() {
+        const container = document.getElementById('exercise-container');
+        container.innerHTML = '';
+        currentTasks = [];
+
+        tasks.forEach((task, index) => {
+            const taskData = {
+                id: index,
+                parts: [...task.parts],
+                currentSentence: [], 
+                pool: [] 
+            };
+
+            // Pool initialisieren
+            taskData.parts.forEach((word, i) => {
+                taskData.pool.push({ text: word, origIndex: i, status: '' });
+            });
+
+            // Pool mischen
+            shuffleArray(taskData.pool);
+
+            // DOM erstellen
+            const card = document.createElement('div');
+            card.className = 'task-card';
+            card.id = `task-${index}`;
+
+            const label = document.createElement('span');
+            label.className = 'task-number';
+            label.textContent = `Satz ${index + 1}`;
+            card.appendChild(label);
+
+            const sentenceArea = document.createElement('div');
+            sentenceArea.className = 'sentence-area';
+            card.appendChild(sentenceArea);
+
+            const poolArea = document.createElement('div');
+            poolArea.className = 'pool-area';
+            card.appendChild(poolArea);
+
+            container.appendChild(card);
+            currentTasks.push(taskData);
+
+            renderTask(index);
+        });
+    }
+
+    function renderTask(index) {
+        const taskData = currentTasks[index];
+        const card = document.getElementById(`task-${index}`);
+        const sentenceArea = card.querySelector('.sentence-area');
+        const poolArea = card.querySelector('.pool-area');
+
+        // Clear content
+        sentenceArea.innerHTML = '';
+        poolArea.innerHTML = '';
+
+        // Prüfe auf Gesamt-Vollständigkeit
+        const isFullLength = taskData.currentSentence.length === tasks[index].correctOrder.length;
+        let allCorrect = true;
+
+        // Render Sentence Chips mit Status
+        taskData.currentSentence.forEach((item, arrIndex) => {
+            const chip = createChip(item.text, () => {
+                moveWordToPool(index, arrIndex);
+            });
+            
+            // Check status sofort
+            if (item.status === 'correct') {
+                chip.classList.add('status-correct');
+            } else {
+                chip.classList.add('status-wrong');
+                allCorrect = false;
+            }
+            
+            sentenceArea.appendChild(chip);
+        });
+
+        // Kasten-Status (Grüner Rahmen wenn alles fertig)
+        if (isFullLength && allCorrect) {
+            sentenceArea.classList.add('fully-correct');
+        } else {
+            sentenceArea.classList.remove('fully-correct');
+        }
+
+        // Render Pool Chips (neutral)
+        taskData.pool.forEach((item, arrIndex) => {
+            const chip = createChip(item.text, () => {
+                moveWordToSentence(index, arrIndex);
+            });
+            poolArea.appendChild(chip);
+        });
+    }
+
+    function createChip(text, onClick) {
+        const span = document.createElement('span');
+        span.className = 'word-chip';
+        span.textContent = text;
+        span.onclick = onClick;
+        return span;
+    }
+
+    // Hilfsfunktion: Überprüft jedes Wort im Satz erneut
+    // Dies ist wichtig, da sich Positionen ändern, wenn man ein Wort zwischendrin löscht
+    function updateStatuses(taskIndex) {
+        const taskData = currentTasks[taskIndex];
+        const correctOrder = tasks[taskIndex].correctOrder;
+
+        taskData.currentSentence.forEach((item, currentPos) => {
+            if (item.origIndex === correctOrder[currentPos]) {
+                item.status = 'correct';
+            } else {
+                item.status = 'wrong';
+            }
+        });
+    }
+
+    function moveWordToSentence(taskIndex, poolIndex) {
+        const taskData = currentTasks[taskIndex];
+        const item = taskData.pool.splice(poolIndex, 1)[0];
+        
+        taskData.currentSentence.push(item);
+        
+        updateStatuses(taskIndex);
+        renderTask(taskIndex);
+    }
+
+    function moveWordToPool(taskIndex, sentIndex) {
+        const taskData = currentTasks[taskIndex];
+        const item = taskData.currentSentence.splice(sentIndex, 1)[0];
+        
+        item.status = ''; // Status resetten wenn im Pool
+        taskData.pool.push(item);
+        
+        updateStatuses(taskIndex);
+        renderTask(taskIndex);
+    }
+
+    function showAllSolutions() {
+        currentTasks.forEach((taskData, index) => {
+            const targetOrder = tasks[index].correctOrder;
+            
+            // Alles resetten
+            taskData.currentSentence = [];
+            taskData.pool = [];
+
+            // Satz anhand der korrekten Reihenfolge aufbauen
+            targetOrder.forEach(origIdx => {
+                taskData.currentSentence.push({
+                    text: tasks[index].parts[origIdx],
+                    origIndex: origIdx,
+                    status: 'correct'
+                });
+            });
+
+            renderTask(index);
+        });
+    }
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', initExercise);
+
+</script>
+
+</body>
+</html>
